@@ -172,6 +172,10 @@ model Ilan {
   cevapAnahtariZamani DateTime? @map("cevap_anahtari_zamani") @db.Timestamptz(6)
 
   uygulamaTipi UygulamaTipi @map("uygulama_tipi")
+  // Yalnızca "Kurumsal" ilanlarda anlamlı — "Türkiye Geneli" tüm ülkeyi
+  // kapsar. Sabit/gerçek dünya listesi (src/lib/iller.ts) — Prisma enum değil,
+  // Zod katmanında doğrulanır.
+  il           String?
   zorluk       Zorluk?
 
   aciklamaMd String? @map("aciklama_md")
@@ -255,6 +259,35 @@ model Koleksiyon {
 
   @@index([aktifMi, sira])
   @@map("koleksiyonlar")
+}
+
+// Ana sayfada Instagram hikayesi görünümünde gösterilen kısa duyurular.
+// Otomatik süre dolumu YOK — admin `aktifMi`/`sira` ile yönetir.
+model Hikaye {
+  id          String   @id @default(cuid())
+  baslik      String
+  gorselUrl   String   @map("gorsel_url")
+  baglanti    String?
+  sira        Int      @default(0)
+  aktifMi     Boolean  @default(true) @map("aktif_mi")
+  olusturulma DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([aktifMi, sira])
+  @@map("hikayeler")
+}
+
+// Site genelinde (üst bar/altbilgi) gösterilen sosyal medya bağlantıları.
+// `platform` sabit bir listeden gelir (src/lib/sosyal-platform.ts) — Prisma
+// enum değil, yeni platform eklemek migration gerektirmesin diye.
+model SosyalBaglanti {
+  id       String  @id @default(cuid())
+  platform String
+  url      String
+  sira     Int     @default(0)
+  aktifMi  Boolean @default(true) @map("aktif_mi")
+
+  @@unique([platform])
+  @@map("sosyal_baglantilar")
 }
 
 model TakvimNotu {

@@ -39,6 +39,13 @@ export const YONETIM_NAV: NavOgesi[] = [
     roller: ["ADMIN", "EDITOR"],
     hazir: true,
   },
+  { href: "/yonetim/hikayeler", etiket: "Hikayeler", roller: ["ADMIN", "EDITOR"], hazir: true },
+  {
+    href: "/yonetim/sosyal-baglantilar",
+    etiket: "Sosyal bağlantılar",
+    roller: ["ADMIN", "EDITOR"],
+    hazir: true,
+  },
   {
     href: "/yonetim/yorumlar",
     etiket: "Yorumlar",

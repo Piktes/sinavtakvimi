@@ -21,6 +21,8 @@ const ROTA_ROLLERI: { onEk: string; roller: string[] }[] = [
   { onEk: "/yonetim/etiketler", roller: ["ADMIN", "EDITOR"] },
   { onEk: "/yonetim/koleksiyonlar", roller: ["ADMIN", "EDITOR"] },
   { onEk: "/yonetim/takvim-notlari", roller: ["ADMIN", "EDITOR"] },
+  { onEk: "/yonetim/hikayeler", roller: ["ADMIN", "EDITOR"] },
+  { onEk: "/yonetim/sosyal-baglantilar", roller: ["ADMIN", "EDITOR"] },
   { onEk: "/yonetim/kullanicilar", roller: ["ADMIN"] },
   { onEk: "/yonetim/sistem", roller: ["ADMIN"] },
 ];
