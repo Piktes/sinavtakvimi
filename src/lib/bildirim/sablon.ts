@@ -57,7 +57,7 @@ export function hatirlatmaEpostasi(girdi: HatirlatmaGirdisi): {
     `Bu hatırlatmayı "${girdi.kaynak}" aboneliğiniz (${OFSET_ETIKETLERI[girdi.ofset] ?? `${girdi.ofset} gün önce`}) nedeniyle aldınız.`,
     `Aboneliği kapatmak için: ${cikis}`,
     "",
-    "Sınav İlan Platformu resmî bir kurum sitesi değildir; bağlayıcı kaynak yayınevinin kendi duyurusudur.",
+    "Sınav Takvimi resmî bir kurum sitesi değildir; bağlayıcı kaynak yayınevinin kendi duyurusudur.",
   ].join("\n");
 
   return { konu: baslikMetni(girdi), metin };

@@ -62,8 +62,8 @@ const VERSIYON_YAZILARI = {
 
 export const metadata: Metadata = {
   title: {
-    default: "Sınav İlan Platformu",
-    template: "%s · Sınav İlan Platformu",
+    default: "Sınav Takvimi",
+    template: "%s · Sınav Takvimi",
   },
   description:
     "Yayınevi ve eğitim kurumlarının deneme sınavı ilanları — takvim üzerinde takip et, bildirim al.",

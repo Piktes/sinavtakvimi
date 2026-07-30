@@ -91,7 +91,7 @@ function gunEkle(tarih: Date, gun: number): Date {
 export function icsUret(
   olaylar: IcsOlayi[],
   secenekler: { takvimAdi: string; aciklama?: string; simdi?: Date } = {
-    takvimAdi: "Sınav İlan",
+    takvimAdi: "Sınav Takvimi",
   },
 ): string {
   const simdi = secenekler.simdi ?? new Date();

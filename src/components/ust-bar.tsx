@@ -3,6 +3,7 @@ import { CalendarDays, UserRound } from "lucide-react";
 import { DuzeySecici, type DuzeySecenegi } from "@/components/duzey-secici";
 import { TemaDugmesi } from "@/components/tema-dugmesi";
 import { KoleksiyonSekmeleri, type KoleksiyonSekmesi } from "@/components/koleksiyon-sekmeleri";
+import { UstBarKabuk } from "@/components/ust-bar-kabuk";
 import { butonVaryantlari } from "@/components/ui/button";
 import { uyeVarsa } from "@/lib/rbac";
 
@@ -21,11 +22,14 @@ export async function UstBar({
   const uye = await uyeVarsa();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-surface">
-      <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 font-baslik font-bold text-text">
+    <UstBarKabuk>
+      <div className="ust-bar-govde mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
+        <Link
+          href="/"
+          className="ust-bar-logo flex items-center gap-2 font-baslik font-bold text-text"
+        >
           <CalendarDays size={20} strokeWidth={1.75} aria-hidden />
-          <span>Sınav İlan</span>
+          <span>Sınav Takvimi</span>
         </Link>
 
         <div className="ml-auto flex items-center gap-2">
@@ -50,7 +54,13 @@ export async function UstBar({
         </div>
       </div>
 
-      <KoleksiyonSekmeleri koleksiyonlar={koleksiyonlar} />
-    </header>
+      {/* Kaydırınca kapanır (globals.css `.ust-bar-sekmeler`) — içerik için
+       * yer açar; sınav tipine yine yukarı kaydırınca ulaşılır. */}
+      <div className="ust-bar-sekmeler">
+        <div>
+          <KoleksiyonSekmeleri koleksiyonlar={koleksiyonlar} />
+        </div>
+      </div>
+    </UstBarKabuk>
   );
 }

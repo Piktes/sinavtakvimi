@@ -90,7 +90,7 @@ export async function kurumIcs(slug: string): Promise<string | null> {
   if (!kurum) return null;
 
   return icsUret(await olaylar({ kurumId: kurum.id, ...gecmisiKirp() }), {
-    takvimAdi: `${kurum.ad} — Sınav İlan`,
+    takvimAdi: `${kurum.ad} — Sınav Takvimi`,
     aciklama: `${kurum.ad} yayınevinin deneme sınavı takvimi.`,
   });
 }
@@ -108,7 +108,7 @@ export async function koleksiyonIcs(slug: string): Promise<string | null> {
   const where = filtreyiWhereCevir(filtreOku(koleksiyon.filtre));
 
   return icsUret(await olaylar({ ...where, ...gecmisiKirp() }), {
-    takvimAdi: `${koleksiyon.ad} — Sınav İlan`,
+    takvimAdi: `${koleksiyon.ad} — Sınav Takvimi`,
     aciklama: `${koleksiyon.ad} koleksiyonundaki deneme sınavları.`,
   });
 }

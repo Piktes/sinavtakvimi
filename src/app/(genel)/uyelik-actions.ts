@@ -35,7 +35,7 @@ async function dogrulamaBaglantisiGonder(eposta: string): Promise<void> {
     kime: eposta,
     konu: "E-posta adresinizi doğrulayın",
     metin: [
-      "Sınav İlan Platformu'na hoş geldiniz.",
+      "Sınav Takvimi'ne hoş geldiniz.",
       "",
       "Hesabınızı etkinleştirmek için bağlantıya tıklayın:",
       baglanti,

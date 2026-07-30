@@ -44,7 +44,7 @@ export async function epostaGonder(girdi: EpostaGirdisi): Promise<GonderimSonucu
 
   try {
     const sonuc = await tasiyici.sendMail({
-      from: process.env.SMTP_FROM ?? "Sınav İlan Platformu <bildirim@localhost>",
+      from: process.env.SMTP_FROM ?? "Sınav Takvimi <bildirim@localhost>",
       to: girdi.kime,
       subject: girdi.konu,
       text: girdi.metin,
