@@ -1,0 +1,171 @@
+/*
+ * §3 GÖRSEL SİSTEM — tek kaynak.
+ *
+ * Bu dosya, uygulamadaki TEK ham değer kaynağıdır. Bileşenler yalnızca
+ * buradaki değişkenleri okur; hiçbir bileşende hex kodu, serbest Tailwind
+ * değeri veya `dark:` öneki bulunmaz (§3.1, scripts/tutarlilik-kontrol.mjs
+ * bunu denetler).
+ *
+ * Renk değişkenleri ROL adıyla anılır (--surface, --text-muted), ham renk
+ * adıyla değil. Açık ve koyu tema aynı adları farklı değerlerle doldurur —
+ * bileşen hangi temada olduğunu bilmez (§3.5).
+ */
+
+:root {
+  /* --- §3.2 Boşluk: 4px tabanlı, 8 basamak. Ara değer yok. --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* --- §3.3 Tipografi: 7 basamak, ölçek dışına çıkılmaz. --- */
+  --text-xs: 12px;
+  --leading-xs: 1.4;
+  --text-sm: 14px;
+  --leading-sm: 1.5;
+  --text-base: 16px;
+  --leading-base: 1.6;
+  --text-lg: 18px;
+  --leading-lg: 1.5;
+  --text-xl: 24px;
+  --leading-xl: 1.3;
+  --text-2xl: 32px;
+  --leading-2xl: 1.2;
+  --text-3xl: 48px;
+  --leading-3xl: 1.1;
+
+  /* Ağırlık yalnızca 400/500/600/700 (§3.3). */
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* --- §3.4 Yarıçap ve gölge: üçer tane. --- */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.08);
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.12);
+
+  /* --- §3.8 Hareket: tek eğri, üç süre. --- */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 400ms;
+
+  /* --- §3.6 Yayınevi rozet rengi: ton slug'dan üretilir, doygunluk ve
+   * açıklık SABİT. Bu sabitlik kritik — rastgele HSL üçlüsü paleti dağıtır. --- */
+  --kurum-doygunluk: 62%;
+  --kurum-aciklik: 42%;
+}
+
+/* ---------------------------------------------------------------------------
+ * V1 "AJANDA" — fiziksel okul ajandası (§5).
+ * Kağıt/mürekkep/işaret/vurgu dörtlüsü.
+ * ------------------------------------------------------------------------- */
+
+:root,
+[data-tema="acik"] {
+  --bg: #edeef0;
+  --bg-subtle: #e4e6e9;
+  --surface: #ffffff;
+  --surface-hover: #f4f5f7;
+  --border: #d3d6db;
+  --border-strong: #b3b8c0;
+
+  --text: #131a24;
+  --text-muted: #4e5866;
+  --text-faint: #78828f;
+
+  --primary: #131a24;
+  --primary-hover: #2a3441;
+  --primary-fg: #ffffff;
+
+  --accent: #ffd43b;
+  --accent-fg: #131a24;
+
+  --success: #157f3d;
+  --success-bg: #dff3e6;
+  --warning: #9a6700;
+  --warning-bg: #fdf3d4;
+  --danger: #e03131;
+  --danger-bg: #fdeaea;
+
+  --focus-ring: #1758c4;
+
+  --kurum-aciklik: 42%;
+}
+
+[data-tema="koyu"] {
+  --bg: #0f1319;
+  --bg-subtle: #151a22;
+  --surface: #1a2029;
+  --surface-hover: #222933;
+  --border: #2c3540;
+  --border-strong: #3f4a58;
+
+  --text: #e8eaed;
+  --text-muted: #a4adba;
+  --text-faint: #78828f;
+
+  --primary: #e8eaed;
+  --primary-hover: #ffffff;
+  --primary-fg: #0f1319;
+
+  /* §5 V1: koyu temada vurgular %10 düşük doygunluk. */
+  --accent: #e6c04a;
+  --accent-fg: #0f1319;
+
+  --success: #5bc47f;
+  --success-bg: #16281d;
+  --warning: #e0b44a;
+  --warning-bg: #2a2313;
+  --danger: #f07171;
+  --danger-bg: #2c1717;
+
+  --focus-ring: #6ea8ff;
+
+  /* Koyu zeminde rozetlerin okunması için ton aynı, açıklık yükseltilir. */
+  --kurum-aciklik: 62%;
+}
+
+/* Kullanıcı tercihi yoksa sistem tercihine uyulur. `data-tema` kökte
+ * yazılıysa (SSR'da çerezden) bu blok devreye girmez — §4.5 sıçramasız geçiş. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema]) {
+    --bg: #0f1319;
+    --bg-subtle: #151a22;
+    --surface: #1a2029;
+    --surface-hover: #222933;
+    --border: #2c3540;
+    --border-strong: #3f4a58;
+
+    --text: #e8eaed;
+    --text-muted: #a4adba;
+    --text-faint: #78828f;
+
+    --primary: #e8eaed;
+    --primary-hover: #ffffff;
+    --primary-fg: #0f1319;
+
+    --accent: #e6c04a;
+    --accent-fg: #0f1319;
+
+    --success: #5bc47f;
+    --success-bg: #16281d;
+    --warning: #e0b44a;
+    --warning-bg: #2a2313;
+    --danger: #f07171;
+    --danger-bg: #2c1717;
+
+    --focus-ring: #6ea8ff;
+
+    --kurum-aciklik: 62%;
+  }
+}
