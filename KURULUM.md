@@ -70,6 +70,26 @@ pnpm dev            # http://localhost:3000
 
 Giriş bilgileri `.env`'deki `SEED_ADMIN_*` değerleridir (admin panel §8 Adım 6'da).
 
+### Bildirim işçisi (isteğe bağlı, §4.8)
+
+Hatırlatma e-postaları **ayrı bir süreçte** çalışır — web sunucusunun içinde
+değil. Dev'de her yeniden derlemede zamanlayıcı yeniden kurulurdu; üretimde de
+birden çok sunucu örneği aynı cron'u çalıştırırdı.
+
+```bash
+pnpm worker         # pg-boss: planlama 06:00 (Europe/Istanbul), gönderim turu 5 dk
+```
+
+Beklemeden denemek için:
+
+```bash
+pnpm bildirim:planla            # bugünü planla, gönderme
+pnpm bildirim:planla --gonder   # planla + bekleyenleri hemen yolla
+```
+
+SMTP `.env`'de tanımlı değilse e-postalar **konsola** düşer ve satır
+`IPTAL / "SMTP yapılandırılmamış"` olarak işaretlenir — sessizce kaybolmaz.
+
 ## Doğrulama komutları
 
 Commit öncesi dördü de temiz olmalı:
@@ -77,9 +97,16 @@ Commit öncesi dördü de temiz olmalı:
 ```bash
 pnpm lint
 pnpm build
-pnpm test           # birim testleri (vitest)
+pnpm test           # birim testleri (vitest, DB'siz)
+pnpm test:db        # veritabanına yazan testler (§4.8 idempotency)
 pnpm tutarlilik     # §3.9 görsel tutarlılık denetimi
 ```
+
+`pnpm test` bilerek DB'siz: CI'da veritabanı olmadan da koşsun.
+`pnpm test:db` ayrı yapılandırma kullanır (`vitest.db.config.ts`) ve çalışan
+bir Postgres ister — §4.8'in "testi yazılacak" dediği idempotency kanıtı
+orada, çünkü kanıtlanması gereken şey Prisma değil **Postgres kısıtının
+kendisi**.
 
 `pnpm test:e2e` Playwright içindir; ilk çalıştırmadan önce
 `pnpm exec playwright install chromium` gerekir.

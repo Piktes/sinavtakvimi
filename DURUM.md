@@ -209,7 +209,37 @@ sayfalarında. Kararlar:
 `z-20` (`takvim/filtre-cubugu.tsx`) — koleksiyon sayfasında filtre çubuğu
 menüyü kapatıyordu. Üç menü de `z-40`'a alındı (yapışkan üst bar z-30).
 
-**Kalan:** pg-boss planlayıcı (8e) + tarih değişikliği yeniden planlaması (8f).
+**8e — bitti.** pg-boss planlayıcı + idempotent gönderim + testleri.
+`lib/bildirim/` altında: `zamanlama.ts` (saf, 16 test), `tekillestir.ts`
+(saf, 9 test), `planlayici.ts`, `gonderici.ts`, `sablon.ts`, `isci.ts`.
+`pnpm worker` ayrı süreç; `pnpm bildirim:planla [--gonder]` elle tetikler.
+
+- **Planlama ≠ gönderme.** Planlayıcı yalnızca `Gonderim` satırı yazar.
+  Gönderim SMTP yüzünden düşerse satır BEKLIYOR kalıp tekrar denenir;
+  planlama yeniden koşsa bile UNIQUE ikinci satırı engeller.
+- **Saçılma rastgele değil, anahtardan türetilir** (`gonderimAni`). Rastgele
+  olsaydı yeniden planlamada `planlanan` kayar, "iki kez gönderdik mi?"
+  sorusu cevaplanamazdı.
+- **Sahiplenme atomik**: `UPDATE ... WHERE durum='BEKLIYOR' ... FOR UPDATE
+SKIP LOCKED RETURNING`. İki işçi aynı satırı alamaz; alamayan e-postayı
+  hiç denemez.
+- SMTP yapılandırılmamışsa satır `IPTAL` olur (BEKLIYOR'a geri koymak sonsuz
+  döngü, GONDERILDI demek yalan olurdu).
+- `askidaKalanlariKurtar()`: işçi çökerse GONDERILIYOR'da kalan satırlar
+  30 dk sonra BEKLIYOR'a döner.
+
+**Şartname dışı ama gerekli düzeltme — seviyeler arası tekilleştirme.**
+§4.8'in UNIQUE'i `(abonelikId, ilanId, ofset)`; kullanıcı hem tek ilana hem
+o ilanı kapsayan koleksiyona abone olduğunda **aynı sabah iki e-posta**
+gidiyordu (tarayıcıda görüldü). `tekillestir.ts` (kullanıcı, ilan, ofset)
+üçlüsünü tekilleştiriyor, **en spesifik abonelik kazanıyor** — böylece
+"abonelikten çık" bağlantısı da doğru hedefi gösteriyor.
+
+**Testler:** `pnpm test` 123 (DB'siz), `pnpm test:db` 14 — ikincisi §4.8'in
+"testi yazılacak" dediği idempotency kanıtı. Sahte istemciyle sınamak bir şey
+kanıtlamazdı; kanıtlanması gereken **Postgres kısıtının kendisi**.
+
+**Kalan:** tarih değişikliği yeniden planlaması (8f).
 
 - pg-boss günlük planlayıcı (06:00), gönderim 08:00 ±15 dk.
 - **Idempotency zorunlu** — `Gonderim` tablosundaki unique kısıt korunmalı;
