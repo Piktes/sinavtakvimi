@@ -1,0 +1,112 @@
+/*
+ * §5 V1 — "AJANDA": fiziksel okul ajandası. Ay ızgarası kahraman öğe;
+ * kullanıcı önce zamanı görür.
+ *
+ * Açık: kağıt · mürekkep · işaret · vurgu
+ * Koyu: aynı vurgular %10 düşük doygunluk
+ * Yazı: Başlık Bricolage Grotesque 700 sıkı · Gövde Inter · Sayısal JetBrains Mono
+ */
+
+[data-versiyon="v1"] {
+  --yazi-baslik: var(--font-bricolage);
+  --yazi-govde: var(--font-inter);
+  --yazi-mono: var(--font-jetbrains);
+  --baslik-harf-araligi: -0.02em;
+  --rozet-buyuk-harf: none;
+  --rozet-harf-araligi: normal;
+}
+
+[data-versiyon="v1"],
+[data-versiyon="v1"][data-tema="acik"] {
+  --bg: #edeef0;
+  --bg-subtle: #e4e6e9;
+  --surface: #ffffff;
+  --surface-hover: #f4f5f7;
+  --border: #d3d6db;
+  --border-strong: #b3b8c0;
+
+  --text: #131a24;
+  --text-muted: #4e5866;
+  --text-faint: #78828f;
+
+  --primary: #131a24;
+  --primary-hover: #2a3441;
+  --primary-fg: #ffffff;
+
+  --accent: #ffd43b;
+  --accent-fg: #131a24;
+
+  --success: #157f3d;
+  --success-bg: #dff3e6;
+  --warning: #9a6700;
+  --warning-bg: #fdf3d4;
+  --danger: #e03131;
+  --danger-bg: #fdeaea;
+
+  --focus-ring: #1758c4;
+  --kurum-aciklik: 42%;
+}
+
+[data-versiyon="v1"][data-tema="koyu"] {
+  --bg: #0f1319;
+  --bg-subtle: #151a22;
+  --surface: #1a2029;
+  --surface-hover: #222933;
+  --border: #2c3540;
+  --border-strong: #3f4a58;
+
+  --text: #e8eaed;
+  --text-muted: #a4adba;
+  --text-faint: #78828f;
+
+  --primary: #e8eaed;
+  --primary-hover: #ffffff;
+  --primary-fg: #0f1319;
+
+  /* §5: koyu temada vurgular %10 düşük doygunluk. */
+  --accent: #e6c04a;
+  --accent-fg: #0f1319;
+
+  --success: #5bc47f;
+  --success-bg: #16281d;
+  --warning: #e0b44a;
+  --warning-bg: #2a2313;
+  --danger: #f07171;
+  --danger-bg: #2c1717;
+
+  --focus-ring: #6ea8ff;
+  --kurum-aciklik: 62%;
+}
+
+/* Kullanıcı tercihi yoksa sistem tercihi. */
+@media (prefers-color-scheme: dark) {
+  [data-versiyon="v1"]:not([data-tema]) {
+    --bg: #0f1319;
+    --bg-subtle: #151a22;
+    --surface: #1a2029;
+    --surface-hover: #222933;
+    --border: #2c3540;
+    --border-strong: #3f4a58;
+
+    --text: #e8eaed;
+    --text-muted: #a4adba;
+    --text-faint: #78828f;
+
+    --primary: #e8eaed;
+    --primary-hover: #ffffff;
+    --primary-fg: #0f1319;
+
+    --accent: #e6c04a;
+    --accent-fg: #0f1319;
+
+    --success: #5bc47f;
+    --success-bg: #16281d;
+    --warning: #e0b44a;
+    --warning-bg: #2a2313;
+    --danger: #f07171;
+    --danger-bg: #2c1717;
+
+    --focus-ring: #6ea8ff;
+    --kurum-aciklik: 62%;
+  }
+}

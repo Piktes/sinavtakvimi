@@ -1,14 +1,15 @@
 /*
- * §3 GÖRSEL SİSTEM — tek kaynak.
+ * §3 GÖRSEL SİSTEM — ÖLÇEKLER (versiyondan bağımsız).
  *
- * Bu dosya, uygulamadaki TEK ham değer kaynağıdır. Bileşenler yalnızca
- * buradaki değişkenleri okur; hiçbir bileşende hex kodu, serbest Tailwind
- * değeri veya `dark:` öneki bulunmaz (§3.1, scripts/tutarlilik-kontrol.mjs
- * bunu denetler).
+ * Bu dosya boşluk, tipografi, yarıçap, gölge ve hareket ölçeklerini tutar;
+ * bunlar üç versiyonda da AYNIDIR (§5: "Fark yalnızca token dosyası ve sayfa
+ * düzeni" — ama ölçek disiplini §3'te ortak kısıt).
  *
- * Renk değişkenleri ROL adıyla anılır (--surface, --text-muted), ham renk
- * adıyla değil. Açık ve koyu tema aynı adları farklı değerlerle doldurur —
- * bileşen hangi temada olduğunu bilmez (§3.5).
+ * Renk rolleri ve yazı tipi atamaları versiyon dosyalarındadır:
+ *   v1-ajanda.css · v2-vitrin.css · v3-akis.css
+ *
+ * Bileşenler yalnızca bu değişkenleri okur; hiçbirinde hex kodu, serbest
+ * Tailwind değeri veya `dark:` öneki bulunmaz (§3.1).
  */
 
 :root {
@@ -60,112 +61,8 @@
   --dur-slow: 400ms;
 
   /* --- §3.6 Yayınevi rozet rengi: ton slug'dan üretilir, doygunluk ve
-   * açıklık SABİT. Bu sabitlik kritik — rastgele HSL üçlüsü paleti dağıtır. --- */
+   * açıklık SABİT. Bu sabitlik kritik — rastgele HSL üçlüsü paleti dağıtır.
+   * Açıklık koyu temada versiyon dosyasında yükseltilir. --- */
   --kurum-doygunluk: 62%;
   --kurum-aciklik: 42%;
-}
-
-/* ---------------------------------------------------------------------------
- * V1 "AJANDA" — fiziksel okul ajandası (§5).
- * Kağıt/mürekkep/işaret/vurgu dörtlüsü.
- * ------------------------------------------------------------------------- */
-
-:root,
-[data-tema="acik"] {
-  --bg: #edeef0;
-  --bg-subtle: #e4e6e9;
-  --surface: #ffffff;
-  --surface-hover: #f4f5f7;
-  --border: #d3d6db;
-  --border-strong: #b3b8c0;
-
-  --text: #131a24;
-  --text-muted: #4e5866;
-  --text-faint: #78828f;
-
-  --primary: #131a24;
-  --primary-hover: #2a3441;
-  --primary-fg: #ffffff;
-
-  --accent: #ffd43b;
-  --accent-fg: #131a24;
-
-  --success: #157f3d;
-  --success-bg: #dff3e6;
-  --warning: #9a6700;
-  --warning-bg: #fdf3d4;
-  --danger: #e03131;
-  --danger-bg: #fdeaea;
-
-  --focus-ring: #1758c4;
-
-  --kurum-aciklik: 42%;
-}
-
-[data-tema="koyu"] {
-  --bg: #0f1319;
-  --bg-subtle: #151a22;
-  --surface: #1a2029;
-  --surface-hover: #222933;
-  --border: #2c3540;
-  --border-strong: #3f4a58;
-
-  --text: #e8eaed;
-  --text-muted: #a4adba;
-  --text-faint: #78828f;
-
-  --primary: #e8eaed;
-  --primary-hover: #ffffff;
-  --primary-fg: #0f1319;
-
-  /* §5 V1: koyu temada vurgular %10 düşük doygunluk. */
-  --accent: #e6c04a;
-  --accent-fg: #0f1319;
-
-  --success: #5bc47f;
-  --success-bg: #16281d;
-  --warning: #e0b44a;
-  --warning-bg: #2a2313;
-  --danger: #f07171;
-  --danger-bg: #2c1717;
-
-  --focus-ring: #6ea8ff;
-
-  /* Koyu zeminde rozetlerin okunması için ton aynı, açıklık yükseltilir. */
-  --kurum-aciklik: 62%;
-}
-
-/* Kullanıcı tercihi yoksa sistem tercihine uyulur. `data-tema` kökte
- * yazılıysa (SSR'da çerezden) bu blok devreye girmez — §4.5 sıçramasız geçiş. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tema]) {
-    --bg: #0f1319;
-    --bg-subtle: #151a22;
-    --surface: #1a2029;
-    --surface-hover: #222933;
-    --border: #2c3540;
-    --border-strong: #3f4a58;
-
-    --text: #e8eaed;
-    --text-muted: #a4adba;
-    --text-faint: #78828f;
-
-    --primary: #e8eaed;
-    --primary-hover: #ffffff;
-    --primary-fg: #0f1319;
-
-    --accent: #e6c04a;
-    --accent-fg: #0f1319;
-
-    --success: #5bc47f;
-    --success-bg: #16281d;
-    --warning: #e0b44a;
-    --warning-bg: #2a2313;
-    --danger: #f07171;
-    --danger-bg: #2c1717;
-
-    --focus-ring: #6ea8ff;
-
-    --kurum-aciklik: 62%;
-  }
 }

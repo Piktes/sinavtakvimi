@@ -1,25 +1,64 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Inter, JetBrains_Mono } from "next/font/google";
-import { cookies } from "next/headers";
+import {
+  Archivo,
+  Archivo_Black,
+  Bricolage_Grotesque,
+  IBM_Plex_Mono,
+  IBM_Plex_Sans,
+  Inter,
+  JetBrains_Mono,
+  Source_Sans_3,
+  Space_Grotesk,
+} from "next/font/google";
 import "./globals.css";
+import { seciliTema } from "@/lib/tercihler";
+import { aktifVersiyon } from "@/lib/versiyon";
 
-// §5 V1 "Ajanda": Başlık Bricolage Grotesque 700 sıkı · Gövde Inter ·
-// Sayısal JetBrains Mono. §7: next/font ile self-host.
-const yaziBaslik = Bricolage_Grotesque({
-  variable: "--yazi-baslik",
+// §5: üç versiyonun yazı tipleri. Yalnızca aktif versiyonun sınıfı <html>'e
+// uygulanır — kullanılmayan aileler render edilen metinde geçmediği için
+// tarayıcı indirmez (§7 performans). next/font ile self-host.
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin", "latin-ext"],
   weight: ["600", "700"],
 });
-
-const yaziGovde = Inter({
-  variable: "--yazi-govde",
+const inter = Inter({ variable: "--font-inter", subsets: ["latin", "latin-ext"] });
+const jetbrains = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin", "latin-ext"],
 });
 
-const yaziMono = JetBrains_Mono({
-  variable: "--yazi-mono",
+const archivoBlack = Archivo_Black({
+  variable: "--font-archivo-black",
+  subsets: ["latin", "latin-ext"],
+  weight: "400",
+});
+const archivo = Archivo({ variable: "--font-archivo", subsets: ["latin", "latin-ext"] });
+const sourceSans = Source_Sans_3({
+  variable: "--font-source-sans",
   subsets: ["latin", "latin-ext"],
 });
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin", "latin-ext"],
+});
+const plexSans = IBM_Plex_Sans({
+  variable: "--font-plex-sans",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700"],
+});
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500"],
+});
+
+const VERSIYON_YAZILARI = {
+  v1: [bricolage.variable, inter.variable, jetbrains.variable],
+  v2: [archivoBlack.variable, archivo.variable, sourceSans.variable, jetbrains.variable],
+  v3: [spaceGrotesk.variable, plexSans.variable, plexMono.variable],
+} as const;
 
 export const metadata: Metadata = {
   title: {
@@ -33,16 +72,15 @@ export const metadata: Metadata = {
 export default async function KokDuzen({ children }: Readonly<{ children: React.ReactNode }>) {
   // §4.5: tema çerezden okunur ve SSR'da <html> üzerine yazılır — geçişte
   // sıçrama olmaz (kabul kriteri #12). Çerez yoksa öznitelik hiç basılmaz,
-  // böylece CSS `prefers-color-scheme` devreye girer.
-  const cerezler = await cookies();
-  const tema = cerezler.get("tema")?.value;
-  const temaOzniteligi = tema === "acik" || tema === "koyu" ? tema : undefined;
+  // böylece CSS `prefers-color-scheme` (V3'te koyu varsayılan) devreye girer.
+  const [tema, versiyon] = await Promise.all([seciliTema(), aktifVersiyon()]);
 
   return (
     <html
       lang="tr"
-      data-tema={temaOzniteligi}
-      className={`${yaziBaslik.variable} ${yaziGovde.variable} ${yaziMono.variable} h-full antialiased`}
+      data-versiyon={versiyon}
+      data-tema={tema ?? undefined}
+      className={`${VERSIYON_YAZILARI[versiyon].join(" ")} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">{children}</body>
     </html>

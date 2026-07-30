@@ -1,16 +1,21 @@
 import Link from "next/link";
+import { AnaSayfaV2 } from "@/components/ana-sayfa/v2-vitrin";
+import { AnaSayfaV3 } from "@/components/ana-sayfa/v3-akis";
 import { KayanSerit } from "@/components/kayan-serit";
 import { DuzeyKarsilama } from "@/components/duzey-karsilama";
 import { IlanKarti } from "@/components/ilan-karti";
 import { kurumRengi } from "@/lib/kurum-tonu";
 import { prisma } from "@/lib/prisma";
 import { seciliDuzeyId } from "@/lib/tercihler";
+import { aktifVersiyon } from "@/lib/versiyon";
 import { yaklasanIlanlar } from "@/lib/veri/ilan";
 
-// §5.9 ana sayfa blokları. Sıralarını admin panelden yönetme (HomepageBlock)
-// §8 Adım 10'da; şimdilik varsayılan sıra sabit.
+// §5: tek kod tabanı, tek API, tek veri katmanı — fark yalnızca token
+// dosyası ve SAYFA DÜZENİ. Veri burada bir kez çekilir, düzen versiyona göre
+// seçilir.
 export default async function AnaSayfa() {
-  const [yaklasan, duzeyId, duzeyler, kurumlar] = await Promise.all([
+  const [versiyon, yaklasan, duzeyId, duzeyler, kurumlar] = await Promise.all([
+    aktifVersiyon(),
     yaklasanIlanlar(7, 12),
     seciliDuzeyId(),
     prisma.etiket.findMany({
@@ -28,10 +33,31 @@ export default async function AnaSayfa() {
 
   const simdi = new Date();
 
+  // §4.2: düzey seçilmemişse karşılama — her üç versiyonda da zorunlu.
+  const karsilama = !duzeyId ? <DuzeyKarsilama duzeyler={duzeyler} /> : null;
+
+  if (versiyon === "v2") {
+    return (
+      <div className="flex flex-col gap-6">
+        {karsilama}
+        <AnaSayfaV2 yaklasan={yaklasan} kurumlar={kurumlar} simdi={simdi} />
+      </div>
+    );
+  }
+
+  if (versiyon === "v3") {
+    return (
+      <div className="flex flex-col gap-5">
+        {karsilama}
+        <AnaSayfaV3 yaklasan={yaklasan} simdi={simdi} />
+      </div>
+    );
+  }
+
+  // V1 "Ajanda" — varsayılan.
   return (
     <div className="flex flex-col gap-6">
-      {/* §4.2: düzey seçilmemişse karşılama gösterilir — engelleyici değil. */}
-      {!duzeyId && <DuzeyKarsilama duzeyler={duzeyler} />}
+      {karsilama}
 
       {/* §4.5: 7 gün içindeki ilanlar. Boşsa tamamen gizlenir. */}
       <div className="-mx-4">

@@ -3,6 +3,7 @@ import { urldenFiltreOku, type Siralama } from "@/components/takvim/filtre-manti
 import type { Prisma } from "@/generated/prisma/client";
 import { seciliDuzeyId } from "@/lib/tercihler";
 import { ayinIlanlari, ayinTakvimNotlari, filtreSecenekleri } from "@/lib/veri/ilan";
+import { aktifVersiyon } from "@/lib/versiyon";
 import { prisma } from "@/lib/prisma";
 
 // /takvim ve /takvim/[yil]/[ay] ile /k/[slug] aynı gövdeyi paylaşır.
@@ -24,11 +25,12 @@ export async function TakvimSayfasi({
     if (typeof deger === "string") params.set(anahtar, deger);
   }
 
-  const [ilanlar, takvimNotlari, secenekler, duzeyId] = await Promise.all([
+  const [ilanlar, takvimNotlari, secenekler, duzeyId, versiyon] = await Promise.all([
     ayinIlanlari(yil, ay, ekFiltre),
     ayinTakvimNotlari(yil, ay),
     filtreSecenekleri(),
     seciliDuzeyId(),
+    aktifVersiyon(),
   ]);
 
   // §4.2: kullanıcının kalıcı düzey seçimi VARSAYILAN filtredir. URL'de açık
@@ -44,7 +46,17 @@ export async function TakvimSayfasi({
   }
 
   const siralama: Siralama = params.get("sirala") === "yayinevi" ? "yayinevi" : "tarih";
-  const gorunum = params.get("gorunum") === "liste" ? "liste" : "aylik";
+
+  // §5 V3 "Akış": liste varsayılan görünüm. URL'de açık seçim varsa o kazanır.
+  const urlGorunumu = params.get("gorunum");
+  const gorunum: "aylik" | "liste" =
+    urlGorunumu === "liste"
+      ? "liste"
+      : urlGorunumu === "aylik"
+        ? "aylik"
+        : versiyon === "v3"
+          ? "liste"
+          : "aylik";
 
   const simdi = new Date();
 

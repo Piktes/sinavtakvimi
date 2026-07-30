@@ -2,8 +2,10 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/cn";
 
 // §3.7: uygulamada TEK Badge.
+// `rozet` sınıfı büyük harf/harf aralığını versiyon token'ından okur —
+// §5 V2 "Vitrin"de rozetler büyük harf ve geniş aralıklı.
 const rozetVaryantlari = cva(
-  "inline-flex w-fit shrink-0 items-center gap-1 rounded-sm border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap",
+  "rozet inline-flex w-fit shrink-0 items-center gap-1 rounded-sm border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap",
   {
     variants: {
       varyant: {

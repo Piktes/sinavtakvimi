@@ -1,5 +1,8 @@
 @import "tailwindcss";
 @import "../styles/tokens/temel.css";
+@import "../styles/tokens/v1-ajanda.css";
+@import "../styles/tokens/v2-vitrin.css";
+@import "../styles/tokens/v3-akis.css";
 
 /*
  * Token'ları Tailwind v4 tema katmanına bağlar: `bg-surface`, `text-muted`,
@@ -58,11 +61,22 @@
   --font-mono: var(--yazi-mono), ui-monospace, monospace;
 }
 
+/* Başlık yazı tipi ve harf aralığı versiyona göre değişir (§5). Bileşenler
+ * `font-baslik` sınıfını kullanır, hangi versiyonda olduklarını bilmez. */
+.font-baslik {
+  letter-spacing: var(--baslik-harf-araligi);
+}
+
 html {
   color-scheme: light;
 }
 
 [data-tema="koyu"] {
+  color-scheme: dark;
+}
+
+/* §5 V3 "Akış" koyu varsayılan — tercih belirtilmemişse koyu. */
+[data-versiyon="v3"]:not([data-tema]) {
   color-scheme: dark;
 }
 
@@ -78,6 +92,12 @@ body {
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: var(--leading-base);
+}
+
+/* §5: rozet biçimi versiyona göre (V2'de büyük harf, geniş aralık). */
+.rozet {
+  text-transform: var(--rozet-buyuk-harf);
+  letter-spacing: var(--rozet-harf-araligi);
 }
 
 /* §3.3: sayısal içerik (tarih, geri sayım, süre, soru sayısı) daima

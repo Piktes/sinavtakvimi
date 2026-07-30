@@ -254,11 +254,23 @@ async function adminYaz(): Promise<void> {
   console.log(`Admin hazır: ${eposta}`);
 }
 
+// §5: aktif versiyon Ayar tablosundan okunur (`?tema=v2` ile önizlenir).
+// §6 "Görünüm" ekranı bu satırı düzenleyecek.
+async function ayarlariYaz(): Promise<void> {
+  await prisma.ayar.upsert({
+    where: { anahtar: "aktif_versiyon" },
+    update: {},
+    create: { anahtar: "aktif_versiyon", deger: "v1", grup: "gorunum" },
+  });
+  console.log("Ayarlar hazır (aktif_versiyon).");
+}
+
 async function main() {
   const tipHaritasi = await kurumTipleriniYaz();
   const etiketHaritasi = await etiketleriYaz();
   await kurumlariYaz(tipHaritasi);
   await koleksiyonlariYaz(etiketHaritasi);
+  await ayarlariYaz();
   await adminYaz();
 }
 
