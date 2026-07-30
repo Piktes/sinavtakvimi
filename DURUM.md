@@ -177,14 +177,18 @@ mümkün olmadığı için eklendi (`Gonderim` ile aynı gerekçe).
 - `Ilan.puanOrtalama`/`puanSayisi` denormalize alanları onaylı yorumlardan
   yeniden hesaplanmalı.
 
-### Adım 10 — Ana sayfa düzeni, Excel içe aktarma, analitik
+### Adım 10 — Ana sayfa düzeni, analitik
 
 - `HomepageBlock` benzeri blok yönetimi: sürükle-bırak sırala, aç/kapat.
   (Şu an ana sayfa blok sırası kodda sabit — §5.9'un "admin yönetir"
   gereğini henüz karşılamıyor.)
-- Excel/CSV içe aktarma: sütun eşleme → doğrulama raporu → onay; hepsi
-  taslak gelir, parti kaydıyla toplu geri alınabilir.
-- Analitik.
+- Analitik: `VisitEvent`/`DailyMetric` benzeri toplama + §6 gösterge
+  panelindeki ziyaretçi/kayıt sayıları (şu an yalnızca ilan/yorum sayaçları
+  gerçek, ziyaretçi metrikleri yok).
+
+> Excel/CSV içe aktarma bu adımdaydı; erken yapıldı (yukarıdaki "Ek" bölümü).
+> Kalan tek parçası yoktu — şablon, doğrulama raporu ve toplu geri alma dahil
+> tamamlandı.
 
 ---
 
