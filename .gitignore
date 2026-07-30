@@ -44,9 +44,17 @@ next-env.d.ts
 # Prisma'nın ürettiği istemci — pnpm install sonrası postinstall ile üretilir
 /src/generated
 
-# Kullanıcı yüklemeleri (prod'da S3/R2'ye taşınacak)
+# Kullanıcı yüklemeleri (prod'da S3/R2'ye taşınacak) — ÇALIŞMA ZAMANINDA
+# oluşanlar depoya girmez.
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# İstisna: elle derlenmiş demo/marka varlıkları. Bunlar kullanıcı yüklemesi
+# değil, depoyla birlikte gelmesi gereken sabit içerik:
+#   kurum-logo/  → yayınevi logoları (admin yüklemeleri `logolar/`e gider)
+#   hikaye-demo/ → ana sayfa hikaye görselleri (admin yüklemeleri `hikayeler/`e gider)
+!/public/uploads/kurum-logo/
+!/public/uploads/hikaye-demo/
 
 # Playwright
 /test-results
