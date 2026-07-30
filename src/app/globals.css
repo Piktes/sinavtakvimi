@@ -45,6 +45,14 @@
   --spacing-7: var(--space-7);
   --spacing-8: var(--space-8);
 
+  /* §3.2 ek — kontrol yükseklikleri (bkz. temel.css'teki gerekçe). */
+  --height-kontrol-sm: var(--kontrol-sm);
+  --height-kontrol-md: var(--kontrol-md);
+  --height-kontrol-lg: var(--kontrol-lg);
+  --width-kontrol-sm: var(--kontrol-sm);
+  --width-kontrol-md: var(--kontrol-md);
+  --width-kontrol-lg: var(--kontrol-lg);
+
   /* §3.4 */
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);

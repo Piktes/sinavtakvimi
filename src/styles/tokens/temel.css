@@ -23,6 +23,20 @@
   --space-7: 48px;
   --space-8: 64px;
 
+  /*
+   * --- §3.2 ek: KONTROL YÜKSEKLİĞİ ---
+   *
+   * Boşluk ölçeğinden AYRI olmak zorunda. Yukarıdaki ramp semantiktir
+   * (7 = 48px), Tailwind'in varsayılan `h-*` ızgarası ise 4px tabanlıdır.
+   * Button `h-7 / h-9 / h-11` yazdığında `h-7` bu ramp'e, `h-9`/`h-11` ise
+   * Tailwind'in varsayılanına düşüyordu; sonuç `sm`(48px) > `lg`(44px) gibi
+   * TERS bir ölçekti. Kontrol yükseklikleri artık kendi adlı token'larından
+   * okunuyor.
+   */
+  --kontrol-sm: 28px;
+  --kontrol-md: 36px;
+  --kontrol-lg: 44px;
+
   /* --- §3.3 Tipografi: 7 basamak, ölçek dışına çıkılmaz. --- */
   --text-xs: 12px;
   --leading-xs: 1.4;

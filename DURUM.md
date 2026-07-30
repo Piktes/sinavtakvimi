@@ -261,19 +261,49 @@ savunma katmanı; tek sayaçta toplamak hangisinin çalıştığını gizliyordu
 
 ---
 
-## Sırada
-
 ### Adım 9 — Yorum + moderasyon
 
-- İlan başına tek yorum + tek puan; puan yorumsuz da verilebilir.
-- **Admin onayından sonra** yayınlanır; ortalama yalnızca onaylılardan ve
-  en az 5 puan toplanana kadar gösterilmez.
-- Otomatik ön filtre: küfür sözlüğü, kişisel veri deseni (telefon/e-posta/
-  Instagram → otomatik ret), bağlantı → bayrak, hız sınırı.
-- Moderasyon kuyruğu: toplu işlem + klavye kısayolları (`a` onayla,
-  `r` reddet, `j/k` gezin).
-- `Ilan.puanOrtalama`/`puanSayisi` denormalize alanları onaylı yorumlardan
-  yeniden hesaplanmalı.
+`lib/moderasyon/` (on-filtre, puan, puan-hesapla, hiz-siniri) +
+`(genel)/yorum-actions.ts` + `components/yorum-bolumu.tsx` ·
+`/hesabim/yorumlarim` · `/yonetim/yorumlar`.
+
+- **Ön filtre karar verici değil, ön eleyici.** TEMIZ çıksa bile yorum
+  BEKLIYOR kaydedilir — §4.9 "admin onayından sonra yayınlanır" diyor,
+  filtre bunu atlatmaz. Filtrenin işi kuyruğu sıralamak ve açık ihlalleri
+  baştan REDDEDILDI işaretlemek.
+- Kişisel veri (telefon/e-posta/@kullanıcı/whatsapp) → **otomatik ret**;
+  bağlantı → **bayrak** (ret değil, moderatör karar verir). Aksan katlaması
+  ve rakam-kaçamağı (`s1kt1r`) açılıyor; `mal`/`sik`/`got` gibi kısa kökler
+  yalnız tam kelime eşleşmesinde sayılıyor ("malzeme" yakalanmıyor).
+- **Tek yorum kuralı güncellemedir, hata değil.** İkinci gönderim mevcut
+  kaydı günceller ve yeniden BEKLIYOR'a düşürür — onaylı bir yorumu
+  değiştirip moderasyonu atlatmak mümkün olmamalı.
+- Hız sınırı `yorumlar` tablosundan okunuyor, bellekten değil: sunucu
+  yeniden başlayınca sınır sıfırlanmasın. Hem kullanıcıya hem IP hash'ine
+  bakılıyor (çok hesap açarak aşmayı engellemek için).
+- `Ilan.puanOrtalama`/`puanSayisi` **tek fonksiyondan** hesaplanıyor
+  (`puanlariYenidenHesapla`); yorum durumunu değiştiren her yol oradan
+  geçiyor. Ortalama 5 puana kadar gizli (§4.9), sayı gizli değil.
+- Moderasyon kuyruğu skor sırasına göre; klavye `j/k` gez, `x` seç,
+  `a` onayla, `r` reddet, `s` spam. Seçim varsa kısayol tümüne uygulanır.
+  Form alanındayken kısayollar devre dışı.
+- §12.3 yasak listesi korundu: yoruma yorum, profil bağlantısı, takip yok.
+  Yazar yalnızca sistem takma adıyla görünüyor.
+
+**Düzeltilen hata (Adım 2'den kalma, tüm ekranları etkiliyordu):** Button
+ölçeği TERS dönmüştü — `sm` 48px, `md` 36px, `lg` 44px. Sebep: proje
+`--spacing-1..8`i semantik bir ramp'e bağlamış (`--space-7: 48px`), ama
+Button `h-7 / h-9 / h-11` yazıyordu; `h-7` ramp'e, `h-9`/`h-11` Tailwind
+varsayılanına düşüyordu. Kontrol yükseklikleri artık ayrı token ramp'inden
+okunuyor (`--kontrol-sm/md/lg`, `h-kontrol-*`). Input, Select ve ilan
+detayındaki satır içi `h-9` da aynı ramp'e alındı.
+
+**Küçük düzeltme:** moderasyon kuyruğunda son öğe karara bağlanınca liste
+boşalıyor ve sonuç mesajı erken `return`'e takılıp kayboluyordu.
+
+---
+
+## Sırada
 
 ### Adım 10 — Ana sayfa düzeni, analitik
 
@@ -351,3 +381,8 @@ kapatıyordu.
 içinde başlatılsaydı dev'de her yeniden derlemede zamanlayıcı yeniden kurulur,
 üretimde de her sunucu örneği aynı cron'u çalıştırırdı. Web süreci kuyruğa
 yalnızca **iş atar** (`lib/bildirim/kuyruk.ts`).
+
+**Buton/kontrol yükseklikleri `--kontrol-*` ramp'inden** — boşluk ölçeğinden
+DEĞİL. `--spacing-1..8` semantik bir ramp'e bağlı (`--space-7: 48px`), bu
+yüzden `h-7`/`size-7` gibi çıplak Tailwind basamakları kontrol yüksekliği
+için kullanılamaz. `h-kontrol-sm/md/lg` kullanın (bkz. `temel.css`).

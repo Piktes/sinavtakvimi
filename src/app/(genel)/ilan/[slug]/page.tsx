@@ -5,6 +5,7 @@ import { ExternalLink } from "lucide-react";
 import { abonelikDurumu } from "@/app/(genel)/abonelik-actions";
 import { BildirimDugmesi } from "@/components/bildirim-dugmesi";
 import { IlanKarti } from "@/components/ilan-karti";
+import { YorumBolumu } from "@/components/yorum-bolumu";
 import { TakvimeEkle } from "@/components/takvime-ekle";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardGovde } from "@/components/ui/card";
@@ -179,7 +180,7 @@ export default async function IlanDetay({ params }: { params: Promise<{ slug: st
             href={ilan.detayUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-9 items-center gap-2 rounded-md border border-border bg-surface px-4 text-sm font-medium text-text transition-colors hover:bg-surface-hover"
+            className="inline-flex h-kontrol-md items-center gap-2 rounded-md border border-border bg-surface px-4 text-sm font-medium text-text transition-colors hover:bg-surface-hover"
           >
             <ExternalLink size={16} strokeWidth={1.75} aria-hidden />
             Yayınevi sayfası
@@ -197,6 +198,9 @@ export default async function IlanDetay({ params }: { params: Promise<{ slug: st
           </div>
         </section>
       )}
+
+      {/* §4.9 değerlendirmeler — onaylı yorumlar + puan formu. */}
+      <YorumBolumu ilanId={ilan.id} puanOrtalama={ilan.puanOrtalama} puanSayisi={ilan.puanSayisi} />
 
       {/* §4.7: "öğrenci çakışma olup olmadığını görmek ister" */}
       {ayniHafta.length > 0 && (

@@ -75,11 +75,18 @@ export default async function HesabimSayfasi() {
             {uye.takmaAd} · {uye.eposta}
           </p>
         </div>
-        <form action={hesabimdanCik}>
-          <Button type="submit" varyant="ikincil" boyut="sm">
-            Çıkış yap
-          </Button>
-        </form>
+        <div className="flex items-center gap-2">
+          <Link href="/hesabim/yorumlarim">
+            <Button varyant="ikincil" boyut="sm">
+              Yorumlarım
+            </Button>
+          </Link>
+          <form action={hesabimdanCik}>
+            <Button type="submit" varyant="ikincil" boyut="sm">
+              Çıkış yap
+            </Button>
+          </form>
+        </div>
       </div>
 
       {!uye.epostaDogrulandi && (
