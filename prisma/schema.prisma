@@ -1,0 +1,433 @@
+// SINAV İLAN PLATFORMU — veri modeli.
+// Kaynak: SINAV-ILAN-PLATFORMU.md §2. Tasarım kuralı: 10 tablo hedefi.
+//
+// Türkçe ICU collation (`Etiket.ad`, `Kurum.ad`, `Ilan.baslik`) ve CHECK
+// kısıtları Prisma'da ifade edilemiyor (`@@check` yok) — elle yazılmış
+// migration'da uygulanıyor, bkz. prisma/migrations/*_ilk_sema.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enum'lar — yalnızca DAVRANIŞI değiştirenler enum. Taksonomi (grup, düzey,
+// format, kurum tipi) tablo, çünkü admin migration olmadan ekleme yapabilmeli
+// (§2 "KurumTipi ← admin yeni tip ekleyebilir, enum DEĞİL").
+// ---------------------------------------------------------------------------
+
+enum EtiketTipi {
+  GRUP
+  DUZEY
+  FORMAT
+}
+
+enum UygulamaTipi {
+  TURKIYE_GENELI
+  KURUMSAL
+}
+
+enum Zorluk {
+  KOLAY
+  ORTA
+  ZOR
+}
+
+enum YayinDurumu {
+  TASLAK
+  YAYINDA
+  ARSIV
+}
+
+enum Gorunum {
+  AYLIK
+  LISTE
+  HAFTALIK
+}
+
+enum TakvimNotuTipi {
+  TATIL
+  BAYRAM
+  SINAV_YOK
+  TAHMINI
+}
+
+enum Rol {
+  KULLANICI
+  MODERATOR
+  EDITOR
+  ADMIN
+}
+
+enum KullaniciDurumu {
+  AKTIF
+  ASKIDA
+  SILINDI
+}
+
+enum TemaTercihi {
+  SISTEM
+  ACIK
+  KOYU
+}
+
+enum YorumDurumu {
+  BEKLIYOR
+  ONAYLANDI
+  REDDEDILDI
+  SPAM
+}
+
+// ---------------------------------------------------------------------------
+// Kurum ve taksonomi
+// ---------------------------------------------------------------------------
+
+model KurumTipi {
+  id      String  @id @default(cuid())
+  ad      String
+  slug    String  @unique
+  sira    Int     @default(0)
+  aktifMi Boolean @default(true) @map("aktif_mi")
+
+  kurumlar Kurum[]
+
+  @@map("kurum_tipleri")
+}
+
+model Kurum {
+  id         String  @id @default(cuid())
+  ad         String
+  slug       String  @unique
+  tipId      String  @map("tip_id")
+  logoUrl    String? @map("logo_url")
+  kapakUrl   String? @map("kapak_url")
+  webSitesi  String? @map("web_sitesi")
+  aciklamaMd String? @map("aciklama_md")
+  sira       Int     @default(0)
+  aktifMi    Boolean @default(true) @map("aktif_mi")
+
+  tip              KurumTipi  @relation(fields: [tipId], references: [id])
+  ilanlar          Ilan[]     @relation("IlanKurum")
+  // Dağıtıcı kurum: sınavı *yapan* Kurum.ilanlar, *dağıtan* bu ilişki
+  // (ör. İşler Kitabevleri onlarca yayınevinin denemesini dağıtır) — §2.
+  dagittigiIlanlar Ilan[]     @relation("IlanDagiticiKurum")
+  abonelikler      Abonelik[]
+
+  @@index([tipId])
+  @@map("kurumlar")
+}
+
+// TEK taksonomi tablosu; GRUP/DUZEY/FORMAT `tip` ile ayrılır (§2).
+// Üç ayrı tablo yerine tek tablo: üçü de aynı şekle sahip (ad/slug/sıra/aktif)
+// ve admin ekranı sekmeyle tek yerden yönetiyor (§6 "Etiketler").
+model Etiket {
+  id      String     @id @default(cuid())
+  tip     EtiketTipi
+  ad      String
+  slug    String
+  kisaAd  String?    @map("kisa_ad")
+  sira    Int        @default(0)
+  aktifMi Boolean    @default(true) @map("aktif_mi")
+
+  grupIlanlari   Ilan[]      @relation("IlanGrup")
+  formatIlanlari Ilan[]      @relation("IlanFormat")
+  duzeyIlanlari  Ilan[]      @relation("IlanDuzeyleri")
+  kullanicilar   Kullanici[]
+
+  @@unique([tip, slug])
+  @@index([tip, sira])
+  @@map("etiketler")
+}
+
+// ---------------------------------------------------------------------------
+// İlan — ürünün kalbi
+// ---------------------------------------------------------------------------
+
+model Ilan {
+  id     String @id @default(cuid())
+  baslik String
+  slug   String @unique
+  seriNo Int?   @map("seri_no")
+
+  kurumId         String  @map("kurum_id")
+  dagiticiKurumId String? @map("dagitici_kurum_id")
+  grupId          String  @map("grup_id")
+  formatId        String  @map("format_id")
+
+  // Salt tarih (@db.Date): ilan panosunda gün önemli, saat ayrı `saat` alanında
+  // serbest metin olarak tutuluyor ("09:45") — §2.
+  sinavTarihi         DateTime  @map("sinav_tarihi") @db.Date
+  sinavBitisTarihi    DateTime? @map("sinav_bitis_tarihi") @db.Date
+  saat                String?
+  sonSiparisTarihi    DateTime? @map("son_siparis_tarihi") @db.Date
+  cevapAnahtariZamani DateTime? @map("cevap_anahtari_zamani") @db.Timestamptz(6)
+
+  uygulamaTipi UygulamaTipi @map("uygulama_tipi")
+  zorluk       Zorluk?
+
+  aciklamaMd String? @map("aciklama_md")
+  afisUrl    String? @map("afis_url")
+  detayUrl   String? @map("detay_url")
+
+  // `sinavTarihi`'nden türetilir (kesme noktası 1 Ağustos) — src/lib/sezon.ts.
+  sezon       String
+  oneCikar    Boolean     @default(false) @map("one_cikar")
+  yayinDurumu YayinDurumu @default(TASLAK) @map("yayin_durumu")
+
+  // Denormalize: ortalama her istekte AVG ile hesaplanmasın (§2).
+  // Yalnızca ONAYLANDI yorumlardan yeniden hesaplanır.
+  puanOrtalama Float? @map("puan_ortalama")
+  puanSayisi   Int    @default(0) @map("puan_sayisi")
+
+  olusturanId String?  @map("olusturan_id")
+  olusturulma DateTime @default(now()) @db.Timestamptz(6)
+  guncellenme DateTime @updatedAt @db.Timestamptz(6)
+
+  kurum         Kurum      @relation("IlanKurum", fields: [kurumId], references: [id])
+  dagiticiKurum Kurum?     @relation("IlanDagiticiKurum", fields: [dagiticiKurumId], references: [id], onDelete: SetNull)
+  grup          Etiket     @relation("IlanGrup", fields: [grupId], references: [id])
+  format        Etiket     @relation("IlanFormat", fields: [formatId], references: [id])
+  duzeyler      Etiket[]   @relation("IlanDuzeyleri")
+  olusturan     Kullanici? @relation("IlanOlusturan", fields: [olusturanId], references: [id], onDelete: SetNull)
+  oturumlar     Oturum[]
+  yorumlar      Yorum[]
+  abonelikler   Abonelik[]
+
+  @@index([yayinDurumu, sinavTarihi])
+  @@index([sezon, sinavTarihi])
+  @@index([kurumId])
+  @@index([grupId])
+  @@index([formatId])
+  @@map("ilanlar")
+}
+
+// Opsiyonel, çoğu ilanda boş (§2).
+model Oturum {
+  id         String  @id @default(cuid())
+  ilanId     String  @map("ilan_id")
+  ad         String
+  saat       String?
+  sureDk     Int?    @map("sure_dk")
+  soruSayisi Int?    @map("soru_sayisi")
+  sira       Int     @default(0)
+
+  ilan Ilan @relation(fields: [ilanId], references: [id], onDelete: Cascade)
+
+  @@index([ilanId, sira])
+  @@map("oturumlar")
+}
+
+// ---------------------------------------------------------------------------
+// Gezinme ve içerik yönetimi
+// ---------------------------------------------------------------------------
+
+// Üst menü = kayıtlı filtreler. `filtre` jsonb'si serbest bırakılmıyor;
+// şekli src/lib/validations/koleksiyon.ts:koleksiyonFiltresiSemasi ile
+// Zod'da sabit (§2).
+model Koleksiyon {
+  id                String  @id @default(cuid())
+  ad                String
+  slug              String  @unique
+  sira              Int     @default(0)
+  aktifMi           Boolean @default(true) @map("aktif_mi")
+  ikon              String?
+  varsayilanGorunum Gorunum @default(AYLIK) @map("varsayilan_gorunum")
+  filtre            Json
+  menudeMi          Boolean @default(true) @map("menude_mi")
+  anaSayfadaMi      Boolean @default(false) @map("ana_sayfada_mi")
+
+  abonelikler Abonelik[]
+
+  @@index([aktifMi, sira])
+  @@map("koleksiyonlar")
+}
+
+model TakvimNotu {
+  id        String         @id @default(cuid())
+  ad        String
+  baslangic DateTime       @db.Date
+  bitis     DateTime       @db.Date
+  tip       TakvimNotuTipi
+  aciklama  String?
+  aktifMi   Boolean        @default(true) @map("aktif_mi")
+
+  @@index([baslangic, bitis])
+  @@map("takvim_notlari")
+}
+
+// ---------------------------------------------------------------------------
+// Kullanıcı, bildirim, yorum
+// ---------------------------------------------------------------------------
+
+model Kullanici {
+  id                     String          @id @default(cuid())
+  eposta                 String          @unique
+  sifreHash              String          @map("sifre_hash")
+  takmaAd                String          @unique @map("takma_ad")
+  epostaDogrulandi       Boolean         @default(false) @map("eposta_dogrulandi")
+  dogrulamaToken         String?         @unique @map("dogrulama_token")
+  yasBeyani13Ustu        Boolean         @map("yas_beyani_13_ustu")
+  duzeyId                String?         @map("duzey_id")
+  temaTercihi            TemaTercihi     @default(SISTEM) @map("tema_tercihi")
+  rol                    Rol             @default(KULLANICI)
+  durum                  KullaniciDurumu @default(AKTIF)
+  sifreDegistirmeZorunlu Boolean         @default(false) @map("sifre_degistirme_zorunlu")
+  olusturulma            DateTime        @default(now()) @db.Timestamptz(6)
+  sonGiris               DateTime?       @map("son_giris") @db.Timestamptz(6)
+
+  duzey              Etiket?        @relation(fields: [duzeyId], references: [id], onDelete: SetNull)
+  abonelikler        Abonelik[]
+  yorumlar           Yorum[]        @relation("YorumYazar")
+  moderasyonlari     Yorum[]        @relation("YorumModerator")
+  olusturduguIlanlar Ilan[]         @relation("IlanOlusturan")
+  denetimKayitlari   DenetimKaydi[]
+  hesaplar           Account[]
+  oturumlar          Session[]
+
+  @@map("kullanicilar")
+}
+
+// Auth.js v5 database session — tablolar Auth.js'in kendi sözleşmesiyle
+// eşleşmesi için İngilizce/camelCase (teknik, kullanıcıya görünmez).
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  kullanici Kullanici @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime @db.Timestamptz(6)
+
+  kullanici Kullanici @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime @db.Timestamptz(6)
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// Bildirim aboneliği: ilan / kurum / koleksiyon hedeflerinden TAM BİRİ dolu
+// (CHECK constraint, num_nonnulls — §2, §4.8).
+model Abonelik {
+  id           String   @id @default(cuid())
+  kullaniciId  String   @map("kullanici_id")
+  ilanId       String?  @map("ilan_id")
+  kurumId      String?  @map("kurum_id")
+  koleksiyonId String?  @map("koleksiyon_id")
+  ofsetler     Int[]    @default([3, 1])
+  aktifMi      Boolean  @default(true) @map("aktif_mi")
+  olusturulma  DateTime @default(now()) @db.Timestamptz(6)
+
+  kullanici   Kullanici   @relation(fields: [kullaniciId], references: [id], onDelete: Cascade)
+  ilan        Ilan?       @relation(fields: [ilanId], references: [id], onDelete: Cascade)
+  kurum       Kurum?      @relation(fields: [kurumId], references: [id], onDelete: Cascade)
+  koleksiyon  Koleksiyon? @relation(fields: [koleksiyonId], references: [id], onDelete: Cascade)
+  gonderimler Gonderim[]
+
+  // Hedef başına tek abonelik. Postgres NULL'ları farklı saydığı için her
+  // unique yalnızca ilgili alan doluyken devreye girer.
+  @@unique([kullaniciId, ilanId])
+  @@unique([kullaniciId, kurumId])
+  @@unique([kullaniciId, koleksiyonId])
+  @@map("abonelikler")
+}
+
+// Idempotency ZORUNLU (§4.8): aynı bildirim iki kez gitmez.
+// §2'nin 10 tablo hedefi dışında ama §4.8 bunu açıkça şart koşuyor
+// ("gönderim tablosunda UNIQUE(abonelikId, ilanId, ofset)").
+model Gonderim {
+  id         String    @id @default(cuid())
+  abonelikId String    @map("abonelik_id")
+  ilanId     String    @map("ilan_id")
+  ofset      Int
+  planlanan  DateTime  @db.Timestamptz(6)
+  gonderilen DateTime? @db.Timestamptz(6)
+  durum      String    @default("BEKLIYOR")
+  hata       String?
+
+  abonelik Abonelik @relation(fields: [abonelikId], references: [id], onDelete: Cascade)
+
+  @@unique([abonelikId, ilanId, ofset])
+  @@index([durum, planlanan])
+  @@map("gonderimler")
+}
+
+model Yorum {
+  id             String      @id @default(cuid())
+  ilanId         String      @map("ilan_id")
+  kullaniciId    String?     @map("kullanici_id")
+  puan           Int?
+  icerik         String
+  durum          YorumDurumu @default(BEKLIYOR)
+  otomatikSkor   Float       @default(0) @map("otomatik_skor")
+  moderatorId    String?     @map("moderator_id")
+  moderasyonNotu String?     @map("moderasyon_notu")
+  ipHash         String      @map("ip_hash")
+  olusturulma    DateTime    @default(now()) @db.Timestamptz(6)
+
+  ilan      Ilan       @relation(fields: [ilanId], references: [id], onDelete: Cascade)
+  // Hesap silinince yorum anonimleşir, içerik kalır (§2, §7 KVKK).
+  kullanici Kullanici? @relation("YorumYazar", fields: [kullaniciId], references: [id], onDelete: SetNull)
+  moderator Kullanici? @relation("YorumModerator", fields: [moderatorId], references: [id], onDelete: SetNull)
+
+  // İlan başına tek yorum + tek puan (§4.9).
+  @@unique([ilanId, kullaniciId])
+  @@index([durum, olusturulma])
+  @@map("yorumlar")
+}
+
+// ---------------------------------------------------------------------------
+// Sistem
+// ---------------------------------------------------------------------------
+
+model Ayar {
+  anahtar String  @id
+  deger   Json
+  grup    String?
+
+  @@map("ayarlar")
+}
+
+model DenetimKaydi {
+  id       String   @id @default(cuid())
+  adminId  String?  @map("admin_id")
+  eylem    String
+  varlik   String
+  varlikId String   @map("varlik_id")
+  oncesi   Json?
+  sonrasi  Json?
+  ipHash   String?  @map("ip_hash")
+  zaman    DateTime @default(now()) @db.Timestamptz(6)
+
+  admin Kullanici? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  @@index([zaman])
+  @@map("denetim_kayitlari")
+}
