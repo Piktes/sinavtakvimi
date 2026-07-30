@@ -60,34 +60,34 @@ Sayfalar: `/`, `/takvim`, `/takvim/[yil]/[ay]`, `/ilan/[slug]`,
 Tek kod tabanı; fark yalnızca token dosyası ve sayfa düzeni. Aktif versiyon
 `Ayar.aktif_versiyon`, `?tema=v2` ile önizlenir (`src/middleware.ts`).
 
+### Adım 6 — Admin: giriş, RBAC, ilan CRUD, önizleme, toplu seri girişi
+
+Auth.js v5 + Credentials, argon2id. `/yonetim` altındaki her şey korumalı.
+
+- **İki katmanlı yetki**: `src/middleware.ts` (Edge, rota→rol kaba kapı) +
+  `src/lib/rbac.ts:requireRol` (her sayfa/action içinde, **rol ve hesap
+  durumu DB'den okunur**).
+- İlk girişte zorunlu şifre değiştirme (`sifreDegistirmeZorunlu`).
+- Gösterge paneli, ilan CRUD (7 filtre + arama), önizleme, yıl kopyalama,
+  toplu seri girişi.
+- Her mutasyon `src/lib/denetim.ts:denetimYaz` üzerinden `DenetimKaydi`
+  yazar; IP tuzlanmış hash olarak saklanır, şifre hash'i kayda girmez.
+
+**Şartnameden sapma — "database session" yerine JWT + DB doğrulaması.**
+§1 "Auth.js v5, database session" diyor ancak `@auth/core` 0.41.3'te
+Credentials sağlayıcısı **koşulsuz JWT üretiyor**
+(`lib/actions/callback/index.js`: `callbacks.jwt` → `jwt.encode` → çerez;
+`adapter.createSession` bu dalda hiç çağrılmıyor). `session.strategy` ne
+olursa olsun değişmiyor. Bu yüzden strateji `"jwt"`; database session'ın asıl
+kazanımı olan **anında iptal edilebilirlik** `requireRol` ile korunuyor: rol
+ve `durum` her korumalı istekte DB'den okunur, token'daki değere güvenilmez.
+Askıya alınan hesap elindeki JWT geçerli olsa bile anında kesilir.
+Sapmadan memnun değilsen alternatif: Auth.js'i bırakıp kendi
+`Session` tablosu + çerez akışını yazmak (tablolar şemada zaten var).
+
 ---
 
 ## Sırada
-
-### Adım 6 — Admin: giriş, RBAC, ilan CRUD, önizleme, toplu seri girişi
-
-**Bu adım ürünün yönetilebilir hale geldiği yer. Öncelik burada.**
-
-- `/yonetim` altında Auth.js v5 **database session** (§1 — şu an hiç auth yok).
-  `Kullanici.sifreHash` argon2id; `Account`/`Session` tabloları hazır.
-- RBAC: ADMIN (her şey) · EDITOR (içerik) · MODERATOR (yalnız yorum).
-  Yetki kontrolü **hem middleware'de hem server action içinde** — middleware
-  tek başına yeterli değil, action doğrudan çağrılabilir (§6).
-- Gösterge paneli: bugünün sayıları, onay bekleyen yorum, yaklaşan 7 gün,
-  son işlemler.
-- **İlan CRUD** — asıl iş ekranı. Liste filtreleri: sezon, kurum, grup,
-  format, zorluk, uygulama tipi, yayın durumu; varsayılan sıralama sınav
-  tarihi artan. Form tek sayfa, oturum bölümü varsayılan kapalı.
-- **Önizleme**: yayınlamadan önce ilanın sitede nasıl göründüğü, seçili
-  versiyonda.
-- **Toplu seri girişi** (§4.1): kurum + grup + format + uygulama tipi bir kez
-  seçilir, sonra satır satır tarih girilir → tek kaydetmede 10 ilan üretilir.
-  **1000+ ilan tek tek girilemeyeceği için bu ekran zorunlu.**
-- Yıl kopyalama: tarihler +1 yıl, taslak olarak açılır.
-- Her mutasyon `DenetimKaydi` yazmalı (değiştirilemez kayıt).
-
-Notlar: `sezon` boş bırakılırsa `src/lib/sezon.ts:sezonTuret` ile
-`sinavTarihi`'nden türetilir. Slug için `src/lib/slug.ts:slugla`.
 
 ### Adım 7 — Admin: kurumlar, etiketler, koleksiyonlar, takvim notları
 

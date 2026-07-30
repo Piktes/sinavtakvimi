@@ -29,12 +29,13 @@ Ayrıntı ve sorun giderme için [`KURULUM.md`](KURULUM.md).
 
 ## Durum
 
-Şartname §8'deki yapım sırasına göre **Adım 1–5 tamamlandı**: şema/migration/
+Şartname §8'deki yapım sırasına göre **Adım 1–6 tamamlandı**: şema/migration/
 seed, görsel token katmanı, demo veri, V1 genel site (takvim, filtreler, ilan
-detay, yayınevi sayfası) ve üç versiyon (V1 Ajanda · V2 Vitrin · V3 Akış).
+detay, yayınevi sayfası), üç versiyon (V1 Ajanda · V2 Vitrin · V3 Akış) ve
+admin paneli (giriş, RBAC, ilan CRUD, önizleme, yıl kopyalama, toplu seri girişi).
 
-Sırada **Adım 6**: admin paneli — giriş, RBAC, ilan CRUD, önizleme, toplu seri
-girişi. Ayrıntı [`DURUM.md`](DURUM.md).
+Sırada **Adım 7**: kurumlar, etiketler, koleksiyon filtre kurucusu ve takvim
+notları ekranları. Ayrıntı [`DURUM.md`](DURUM.md).
 
 ## Yığın
 
