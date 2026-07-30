@@ -1,15 +1,17 @@
 import { AltSekmeCubugu } from "@/components/alt-sekme-cubugu";
+import { SosyalIkonSatiri } from "@/components/sosyal-ikon-satiri";
 import { UstBar } from "@/components/ust-bar";
 import { prisma } from "@/lib/prisma";
 import { seciliDuzeyId, seciliTema } from "@/lib/tercihler";
 import { aktifVersiyon, VERSIYON_ADLARI } from "@/lib/versiyon";
+import { aktifSosyalBaglantilar } from "@/lib/veri/sosyal";
 import { koleksiyonlar } from "@/lib/veri/ilan";
 
 // Genel site düzeni: üst bar + koleksiyon sekmeleri (§5.3).
 // §5: üç versiyon tek kod tabanı — düzen farkları versiyona göre burada
 // ve ana sayfada; bileşenler versiyonu bilmez, token'ları okur.
 export default async function GenelDuzen({ children }: { children: React.ReactNode }) {
-  const [sekmeler, duzeyler, duzeyId, tema, versiyon] = await Promise.all([
+  const [sekmeler, duzeyler, duzeyId, tema, versiyon, sosyalBaglantilar] = await Promise.all([
     koleksiyonlar(),
     prisma.etiket.findMany({
       where: { tip: "DUZEY", aktifMi: true },
@@ -19,6 +21,7 @@ export default async function GenelDuzen({ children }: { children: React.ReactNo
     seciliDuzeyId(),
     seciliTema(),
     aktifVersiyon(),
+    aktifSosyalBaglantilar(),
   ]);
 
   return (
@@ -34,6 +37,8 @@ export default async function GenelDuzen({ children }: { children: React.ReactNo
             Bu site resmî bir kurum sitesi değildir. Tarihler ilgili kurumların duyurularından
             derlenmiştir; bağlayıcı kaynak kurumun kendi duyurusudur.
           </p>
+          <SosyalIkonSatiri baglantilar={sosyalBaglantilar} />
+
           {/* §5: `?tema=v2` ile önizleme. Aktif versiyon Ayar tablosundan;
            * bu bağlantılar geliştirme/önizleme kolaylığı için. */}
           <p className="flex items-center gap-2">
@@ -51,8 +56,9 @@ export default async function GenelDuzen({ children }: { children: React.ReactNo
         </div>
       </footer>
 
-      {/* §5 V3 imzası: alt sekme çubuğu (mobilde). */}
-      {versiyon === "v3" && <AltSekmeCubugu />}
+      {/* Alt sekme çubuğu (mobilde) — başlangıçta yalnızca V3 imzasıydı, mobil
+       * gezinmede belirgin fayda sağladığı için üç versiyonda da açık. */}
+      <AltSekmeCubugu />
     </>
   );
 }

@@ -147,6 +147,322 @@ body {
   animation-play-state: paused;
 }
 
+/* §5 V1 kahraman bölümü: token'lardan üretilmiş katmanlı gradyan zemin —
+ * §3.1'e uygun, hiçbir hex/rgb literali yok, yalnızca mevcut renk
+ * değişkenlerinin karışımı. */
+.kahraman-zemin {
+  background:
+    radial-gradient(circle at 15% -20%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--primary) 16%, transparent), transparent 55%),
+    var(--bg-subtle);
+}
+
+/* §5 V1 imzası: geri sayım rakamları flip-clock kartı gibi durur (sabit
+ * metin — kabul kriteri #6 gereği aria-live veya canlı sayaç yok, yalnızca
+ * görünüm). Ortadaki menteşe çizgisi ::after ile. */
+.flip-rakam {
+  position: relative;
+  overflow: hidden;
+}
+
+.flip-rakam::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto 0;
+  height: 1px;
+  background: var(--bg);
+  opacity: 0.5;
+}
+
+/* Kahraman bölümü sayfa yüklenince tek seferlik belirir — tek eğri/tek süre
+ * (§3.8), `prefers-reduced-motion` altında global kural süreyi sıfırlar. */
+@keyframes kahraman-belir {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-2));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.kahraman-belir {
+  animation: kahraman-belir var(--dur-slow) var(--ease) both;
+}
+
+/* "Bugün"/"Yarın" rozeti dikkat çeksin diye birkaç kez nabız gibi atar,
+ * sonra durur — sürekli yanıp sönen metin WCAG 2.2.2'yi ihlal eder (durdurma
+ * mekanizması gerektirir), bu yüzden `infinite` değil sınırlı tekrar (§3.8:
+ * süre yine token'dan, --dur-slow'un katı). `prefers-reduced-motion` altında
+ * global kural zaten tek karede durduruyor. */
+@keyframes aciliyet-nabiz {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.aciliyet-nabiz {
+  animation: aciliyet-nabiz calc(var(--dur-slow) * 4) var(--ease) 3;
+}
+
+/* §5 V2 "Vitrin" imzası: magazin künyesi. V1'in yumuşak gradyanının aksine
+ * KESKİN editoryal dil — üstte kalın vurgu kuralı, altında düz yüzey. */
+.kunye-zemin {
+  background: var(--surface);
+  border-top: var(--space-1) solid var(--accent);
+  border-bottom: 1px solid var(--border-strong);
+}
+
+/* §5 V2 imzası: uyarı bandı kalemleri kayar (şartname: "kalemler kayar").
+ * Kayan şeritle aynı teknik — CSS transform, marquee/setInterval yok. */
+.bant-parca {
+  animation: serit-kaydir 30s linear infinite;
+}
+
+.bant-kapsayici:hover .bant-parca,
+.bant-kapsayici:focus-within .bant-parca {
+  animation-play-state: paused;
+}
+
+/* §5 V3: yayınevi sırası kendiliğinden kayar (kayan şeritle aynı teknik —
+ * CSS transform, setInterval yok). Üzerine gelince/odaklanınca durur ki
+ * tıklanabilsin. */
+.logo-akis {
+  animation: serit-kaydir 45s linear infinite;
+}
+
+.logo-akis-kapsayici:hover .logo-akis,
+.logo-akis-kapsayici:focus-within .logo-akis {
+  animation-play-state: paused;
+}
+
+/* §5 V3 "Akış" imzası: uygulama başlığı — koyu varsayılanla uyumlu, birincil
+ * (teal) ve ikincil (mor) vurguların yumuşak karışımı. V1'in gradyanından
+ * farklı: dikey, tek yönlü, "uygulama üst bandı" hissi. */
+.akis-zemin {
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--primary) 20%, transparent),
+    color-mix(in srgb, var(--accent) 14%, transparent) 60%,
+    transparent
+  );
+}
+
+/* Yatay kaydırmalı şeritleri (hikayeler, sınav tipi sekmeleri) ortalar.
+ * `safe` şart: içerik kapsayıcıdan taştığında düz `center` iki yandan kırpar
+ * ve baştakilere kaydırarak bile ulaşılamaz; `safe center` taşma durumunda
+ * otomatik olarak başa hizalar. */
+.serit-orta {
+  justify-content: safe center;
+}
+
+/* --- ÜST BAR: kaydırma tepkisi ---
+ * Durum bayrağı <html>'de (`data-kaydi`) tutulur, çünkü üst barın yüksekliği
+ * SAYFANIN BAŞKA YERLERİNDEKİ yapışkan öğeleri de ilgilendiriyor (takvim
+ * filtre çubuğu, V3 hafta şeridi). Yükseklik tek bir değişkenden okunur;
+ * bar daralınca onlar da yukarı kayar, arada boşluk kalmaz. */
+/* Gerçek değeri UstBarKabuk ölçüp yazar (ResizeObserver); buradaki yalnızca
+ * JS çalışmadan önceki ilk boyama için makul bir başlangıç. */
+:root {
+  --ust-bar-yuksekligi: 128px;
+}
+
+.yapiskan-ust {
+  position: sticky;
+  top: var(--ust-bar-yuksekligi);
+  transition: top var(--dur-base) var(--ease);
+}
+
+.ust-bar {
+  transition:
+    box-shadow var(--dur-base) var(--ease),
+    background-color var(--dur-base) var(--ease);
+}
+
+:root[data-kaydi="evet"] .ust-bar {
+  box-shadow: var(--shadow-lg);
+  /* Yarı saydam + bulanık: altından geçen içerik hissedilir ("cam" etkisi). */
+  background-color: color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter: blur(12px) saturate(140%);
+}
+
+/* Daralma: iç boşluk küçülür, logo yazısı ufalır. */
+.ust-bar-govde {
+  transition: padding var(--dur-base) var(--ease);
+}
+
+:root[data-kaydi="evet"] .ust-bar-govde {
+  padding-top: var(--space-1);
+  padding-bottom: var(--space-1);
+}
+
+.ust-bar-logo {
+  transition:
+    font-size var(--dur-base) var(--ease),
+    opacity var(--dur-base) var(--ease);
+}
+
+:root[data-kaydi="evet"] .ust-bar-logo {
+  font-size: var(--text-sm);
+}
+
+/* Sekme satırı kaydırınca tamamen kapanır — içerik için yer açar, en
+ * belirgin hareket bu. `grid-template-rows` geçişi yüksekliği animasyonlu
+ * kapatmanın (auto'ya animasyon yapılamadığı için) standart yolu. */
+.ust-bar-sekmeler {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows var(--dur-base) var(--ease),
+    opacity var(--dur-base) var(--ease);
+}
+
+.ust-bar-sekmeler > * {
+  overflow: hidden;
+}
+
+:root[data-kaydi="evet"] .ust-bar-sekmeler {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+/* Okuma ilerlemesi: üst barın alt kenarında ince vurgu çizgisi. */
+.ilerleme-cizgisi {
+  height: 2px;
+  background: var(--accent);
+  transform-origin: left;
+  transition: transform 80ms linear;
+}
+
+/* Gezinme bağlantıları: fareyle üzerine gelince yazı ağırlığı artar.
+ * `font-variation-settings` değil `font-weight` — değişken yazı tipi
+ * garantisi yok. Genişlik zıplamasın diye kutu genişliği sabitleniyor. */
+.gezinme-bagi {
+  transition:
+    color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease);
+}
+
+.gezinme-bagi::after {
+  content: attr(data-etiket);
+  display: block;
+  height: 0;
+  overflow: hidden;
+  font-weight: var(--weight-bold);
+  visibility: hidden;
+}
+
+.gezinme-bagi:hover {
+  font-weight: var(--weight-bold);
+}
+
+/* Yayınevi logoları şeffaf PNG olarak saklanıyor; çoğu lacivert/siyah çizimli
+ * olduğu için KOYU temada zemine karışıp kayboluyorlardı. Marka logoları bu
+ * yüzden her iki temada da sabit açık bir "plaka" üstünde durur — logo
+ * duvarlarında standart çözüm. Tema token'ı DEĞİL bilinçli sabit: markanın
+ * kendi rengi her koşulda doğru okunmalı. */
+.logo-plaka {
+  background: #fff;
+}
+
+/* §3.6 ek: yayınevi amblemi üst şeridi — kurum-zemin ile aynı ton, yalnızca
+ * daha büyük yüzeyde kullanılıyor. */
+.kurum-amblem-seridi {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, hsl(var(--kurum-h) var(--kurum-doygunluk) var(--kurum-aciklik)) 100%, var(--surface) 12%),
+    hsl(var(--kurum-h) var(--kurum-doygunluk) var(--kurum-aciklik))
+  );
+}
+
+/* Kaydırarak aşağı inince içerik canlanarak belirir (bkz. ScrollBelir) —
+ * `IntersectionObserver` görünürlüğe göre `.gorunur` sınıfını ekliyor, geçiş
+ * tek eğri/tek süre (§3.8). `prefers-reduced-motion` altında global kural
+ * süreyi sıfırlıyor. */
+.scroll-belir {
+  opacity: 0;
+  transform: translateY(var(--space-4));
+  transition:
+    opacity var(--dur-slow) var(--ease),
+    transform var(--dur-slow) var(--ease);
+}
+
+.scroll-belir.gorunur {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* §5: hareketin KENDİSİ de versiyon imzası — üç versiyon aynı animasyonu
+ * kullanmaz. V1 "Ajanda" yukarı kayar (yukarıdaki varsayılan), V2 "Vitrin"
+ * magazin sayfası gibi yandan girer, V3 "Akış" uygulama gibi ölçeklenir. */
+.scroll-belir[data-hareket="kayar"] {
+  transform: translateX(calc(-1 * var(--space-5)));
+}
+
+.scroll-belir[data-hareket="kayar"].gorunur {
+  transform: translateX(0);
+}
+
+.scroll-belir[data-hareket="olcek"] {
+  transform: scale(0.96);
+}
+
+.scroll-belir[data-hareket="olcek"].gorunur {
+  transform: scale(1);
+}
+
+/* Hikaye şeridi: kullanıcı isteği üzerine Instagram hikayesiyle AYNI görünüm
+ * — bu yüzden token paletinden değil, o ürünün tanınır gradyanından
+ * (sarı→turuncu→kırmızı→mor→mavi) bilerek kullanılıyor. Tek yer burası;
+ * §3.1'in hex yasağı yalnızca .ts/.tsx dosyalarını kapsıyor (bkz.
+ * tutarlilik-kontrol.mjs), bileşenlerde hâlâ hiçbir hex yok. */
+.hikaye-halka {
+  background: conic-gradient(
+    from 217deg,
+    #fdf497,
+    #fd5949,
+    #d6249f,
+    #285aeb,
+    #fdf497
+  );
+}
+
+.hikaye-halka-gorulmus {
+  background: var(--border-strong);
+}
+
+/* Tam ekran hikaye görüntüleyici — bilerek site temasından bağımsız, her
+ * zaman koyu (bkz. hikaye-goruntuleyici.tsx'teki gerekçe). */
+.hikaye-zemin {
+  background: #000;
+}
+
+.hikaye-ilerleme-yolu {
+  background: rgb(255 255 255 / 35%);
+}
+
+.hikaye-ilerleme-dolu {
+  background: #fff;
+}
+
+.hikaye-metin {
+  color: #fff;
+}
+
+.hikaye-kapat {
+  color: #fff;
+}
+
+.hikaye-cta {
+  background: #fff;
+  color: #000;
+}
+
 /* §3.7: odak halkası her etkileşimli öğede aynı. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid var(--focus-ring);

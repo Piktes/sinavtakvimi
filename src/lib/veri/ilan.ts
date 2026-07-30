@@ -17,6 +17,7 @@ export interface IlanOzet {
   sonSiparisTarihi: string | null;
   cevapAnahtariZamani: string | null;
   uygulamaTipi: "TURKIYE_GENELI" | "KURUMSAL";
+  il: string | null;
   zorluk: "KOLAY" | "ORTA" | "ZOR" | null;
   oneCikar: boolean;
   puanOrtalama: number | null;
@@ -39,6 +40,7 @@ const ILAN_SECIMI = {
   sonSiparisTarihi: true,
   cevapAnahtariZamani: true,
   uygulamaTipi: true,
+  il: true,
   zorluk: true,
   oneCikar: true,
   puanOrtalama: true,

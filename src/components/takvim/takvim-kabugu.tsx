@@ -142,6 +142,7 @@ export function TakvimKabugu({
                       duzeyler: [],
                       zorluklar: [],
                       uygulamaTipleri: [],
+                      iller: [],
                     };
                     setFiltre(bos);
                     urlYaz(bos, siralama, gorunum);

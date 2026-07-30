@@ -1,9 +1,13 @@
 "use client";
 
-import { X } from "lucide-react";
+import { Search, SlidersHorizontal, X } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { cn } from "@/lib/cn";
+import { ILLER } from "@/lib/iller";
 import { kurumRengi } from "@/lib/kurum-tonu";
 import type { AktifFiltre, Siralama } from "@/components/takvim/filtre-mantigi";
 import { aktifFiltreSayisi } from "@/components/takvim/filtre-mantigi";
@@ -44,6 +48,10 @@ export function FiltreCubugu({
   onGorunumDegis: (yeni: "aylik" | "liste") => void;
 }) {
   const sayi = aktifFiltreSayisi(filtre);
+  // §4.5: beş facet listesi açıkken takvimi/listeyi aşağı itiyordu — mobilde
+  // tüm ekranı kaplıyordu. Artık HER ekran boyutunda varsayılan KAPALI,
+  // "Filtrele" düğmesiyle açılır.
+  const [filtreAcik, setFiltreAcik] = useState(false);
 
   function coklukDegistir(alan: keyof AktifFiltre, deger: string) {
     const mevcut = filtre[alan];
@@ -77,12 +85,20 @@ export function FiltreCubugu({
       deger,
       etiket: UYGULAMALAR.find((u) => u.deger === deger)?.ad ?? deger,
     })),
+    ...filtre.iller.map((deger) => ({
+      alan: "iller" as const,
+      deger,
+      etiket: deger,
+    })),
   ];
 
   return (
-    <div className="sticky top-24 z-20 flex flex-col gap-3 rounded-md border border-border bg-surface p-3">
+    <div className="yapiskan-ust z-20 flex flex-col gap-3 rounded-md border border-border bg-surface p-3">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-1">
+        {/* §4.4: mobilde ızgara kullanılmaz, her zaman liste gösterilir —
+         * bu yüzden görünüm seçici orada gizli. Açık kalsaydı "Aylık" seçili
+         * görünürken liste gösterilir, kontrol yalan söylerdi. */}
+        <div className="hidden items-center gap-1 md:flex">
           <span className="text-sm text-text-muted">Görünüm:</span>
           <Button
             varyant={gorunum === "aylik" ? "birincil" : "hayalet"}
@@ -100,6 +116,16 @@ export function FiltreCubugu({
           </Button>
         </div>
 
+        <Button
+          varyant={filtreAcik ? "birincil" : "ikincil"}
+          boyut="sm"
+          aria-expanded={filtreAcik}
+          onClick={() => setFiltreAcik((onceki) => !onceki)}
+        >
+          <SlidersHorizontal size={16} strokeWidth={1.75} aria-hidden />
+          Filtrele{sayi > 0 ? ` (${sayi})` : ""}
+        </Button>
+
         <div className="flex items-center gap-2">
           <label htmlFor="sirala" className="text-sm text-text-muted">
             Sırala:
@@ -116,7 +142,9 @@ export function FiltreCubugu({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      <div
+        className={cn("grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-5", !filtreAcik && "hidden")}
+      >
         <CokluSecim
           etiket="Yayınevi"
           secenekler={secenekler.kurumlar.map((k) => ({ deger: k.slug, ad: k.ad }))}
@@ -141,6 +169,12 @@ export function FiltreCubugu({
           secenekler={UYGULAMALAR}
           secili={filtre.uygulamaTipleri}
           onDegis={(deger) => coklukDegistir("uygulamaTipleri", deger)}
+        />
+        <CokluSecim
+          etiket="İl"
+          secenekler={ILLER.map((il) => ({ deger: il, ad: il }))}
+          secili={filtre.iller}
+          onDegis={(deger) => coklukDegistir("iller", deger)}
         />
       </div>
 
@@ -172,6 +206,7 @@ export function FiltreCubugu({
                 duzeyler: [],
                 zorluklar: [],
                 uygulamaTipleri: [],
+                iller: [],
               })
             }
           >
@@ -183,8 +218,22 @@ export function FiltreCubugu({
   );
 }
 
-// §4.3: yayınevi seçici arama kutusu + çoklu seçim. 45 kurum için düz metin
-// listesi yerine renk imli, aranabilir liste.
+// Türkçe arama: büyük/küçük harf ve aksan farkını yok sayar ("ı/i", "ş/s"…).
+// `localeCompare` yerine normalize, çünkü burada sıralama değil ARAMA var.
+function aramaAnahtari(metin: string): string {
+  return metin
+    .toLocaleLowerCase("tr-TR")
+    .replaceAll("ı", "i")
+    .replaceAll("ğ", "g")
+    .replaceAll("ü", "u")
+    .replaceAll("ş", "s")
+    .replaceAll("ö", "o")
+    .replaceAll("ç", "c");
+}
+
+// §4.3: yayınevi seçici arama kutusu + çoklu seçim. 47 kurum / 81 il için düz
+// metin listesi yerine renk imli, ARANABİLİR liste. Arama kutusu yalnızca
+// liste uzunsa (8+) gösterilir — kısa listelerde gereksiz gürültü olurdu.
 function CokluSecim({
   etiket,
   secenekler,
@@ -198,11 +247,41 @@ function CokluSecim({
   onDegis: (deger: string) => void;
   renkli?: boolean;
 }) {
+  const [arama, setArama] = useState("");
+  const aramaGoster = secenekler.length >= 8;
+
+  const gosterilecek = arama
+    ? secenekler.filter((s) => aramaAnahtari(s.ad).includes(aramaAnahtari(arama)))
+    : secenekler;
+
   return (
     <fieldset className="flex flex-col gap-1">
       <legend className="text-xs font-medium text-text-muted">{etiket}</legend>
+
+      {aramaGoster && (
+        <div className="relative">
+          <Search
+            size={16}
+            strokeWidth={1.75}
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-text-faint"
+          />
+          <Input
+            type="search"
+            value={arama}
+            onChange={(olay) => setArama(olay.target.value)}
+            aria-label={`${etiket} içinde ara`}
+            placeholder="Ara…"
+            className="h-kontrol-sm pl-8 text-sm"
+          />
+        </div>
+      )}
+
       <div className="max-h-32 overflow-y-auto rounded-sm border border-border p-1">
-        {secenekler.map((secenek) => (
+        {gosterilecek.length === 0 && (
+          <p className="px-2 py-1 text-xs text-text-muted">Eşleşme yok.</p>
+        )}
+        {gosterilecek.map((secenek) => (
           <label
             key={secenek.deger}
             className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1 text-sm text-text transition-colors hover:bg-surface-hover"

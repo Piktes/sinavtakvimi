@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CalendarX } from "lucide-react";
 import { abonelikDurumu } from "@/app/(genel)/abonelik-actions";
@@ -37,6 +38,7 @@ export default async function YayineviSayfasi({ params }: { params: Promise<{ sl
       id: true,
       ad: true,
       slug: true,
+      logoUrl: true,
       webSitesi: true,
       aciklamaMd: true,
       aktifMi: true,
@@ -58,11 +60,27 @@ export default async function YayineviSayfasi({ params }: { params: Promise<{ sl
   return (
     <div className="flex flex-col gap-5">
       <header className="flex flex-wrap items-center gap-3">
-        <span
-          aria-hidden
-          style={kurumRengi(kurum.slug)}
-          className="kurum-zemin size-10 shrink-0 rounded-md"
-        />
+        {kurum.logoUrl ? (
+          <span className="logo-plaka flex size-14 shrink-0 items-center justify-center rounded-md border border-border p-2">
+            <Image
+              src={kurum.logoUrl}
+              alt={kurum.ad}
+              width={80}
+              height={80}
+              className="size-full object-contain"
+            />
+          </span>
+        ) : (
+          <span
+            aria-hidden
+            style={kurumRengi(kurum.slug)}
+            className="kurum-amblem-seridi flex size-14 shrink-0 items-center justify-center rounded-md"
+          >
+            <span className="font-baslik text-2xl font-bold text-surface">
+              {kurum.ad.charAt(0).toLocaleUpperCase("tr-TR")}
+            </span>
+          </span>
+        )}
         <div>
           <h1 className="font-baslik text-2xl font-bold text-text">{kurum.ad}</h1>
           <div className="mt-1 flex items-center gap-2">

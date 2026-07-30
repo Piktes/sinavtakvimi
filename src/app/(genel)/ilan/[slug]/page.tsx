@@ -88,6 +88,7 @@ export default async function IlanDetay({ params }: { params: Promise<{ slug: st
 
         <div className="flex flex-wrap gap-1">
           <Badge varyant="cizgi">{UYGULAMA_ETIKETI[ilan.uygulamaTipi]}</Badge>
+          {ilan.il && <Badge varyant="notr">{ilan.il}</Badge>}
           {ilan.zorluk && <Badge varyant="notr">{ZORLUK_ETIKETI[ilan.zorluk]} zorluk</Badge>}
           <Badge varyant="notr">{ilan.format.ad}</Badge>
           {ilan.duzeyler.map((duzey) => (

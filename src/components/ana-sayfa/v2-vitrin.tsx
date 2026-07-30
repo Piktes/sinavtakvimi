@@ -1,90 +1,122 @@
+import Image from "next/image";
 import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 import { IlanKarti } from "@/components/ilan-karti";
+import { KurumAmblemi } from "@/components/kurum-amblemi";
+import { ScrollBelir } from "@/components/scroll-belir";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardGovde } from "@/components/ui/card";
 import { kurumRengi } from "@/lib/kurum-tonu";
-import { formatTarihAralik, kalanGun } from "@/lib/tarih";
+import { formatTarihAralik, kalanGun, kalanGunSayisi } from "@/lib/tarih";
 import type { IlanOzet } from "@/lib/veri/ilan";
 
 // §5 V2 "Vitrin": yayınevi markalarının öne çıktığı magazin düzeni.
-// İmza: en üstte ekranı kesen kalın uyarı bandı, altında büyük yayınevi
-// logo duvarı. Düzen: öne çıkan ilan büyük kart, yanında yaklaşanlar listesi.
+// İmza: en üstte ekranı kesen, KALEMLERİ KAYAN kalın uyarı bandı; altında
+// magazin künyesi (kapak manşeti) ve büyük yayınevi logo duvarı.
+//
+// V1'den bilinçli farklar (§5 "fark yalnızca token ve DÜZEN"):
+//   · geri sayım flip-clock kartı DEĞİL, künye üstünde tek satır manşet
+//   · kahraman zemin yumuşak gradyan DEĞİL, keskin editoryal kural çizgisi
+//   · kaydırma hareketi yukarı DEĞİL, sayfa çevirir gibi yandan
 export function AnaSayfaV2({
   yaklasan,
   kurumlar,
   simdi,
 }: {
   yaklasan: IlanOzet[];
-  kurumlar: { id: string; ad: string; slug: string }[];
+  kurumlar: { id: string; ad: string; slug: string; logoUrl: string | null }[];
   simdi: Date;
 }) {
   const oneCikan = yaklasan[0];
   const digerleri = yaklasan.slice(1, 7);
+  // Bant kalemleri: 7 gün içindekiler. Kesintisiz kayma için liste iki kez
+  // basılır (kayan şeritle aynı teknik).
+  const bantKalemleri = yaklasan.filter((ilan) => kalanGunSayisi(dateOf(ilan.sinavTarihi), simdi) <= 7);
 
   return (
     <div className="flex flex-col gap-6">
-      {/* §5 V2 imzası: ekranı kesen kalın uyarı bandı. */}
+      {/* §5 V2 imzası: ekranı kesen kalın uyarı bandı, kalemleri kayar. */}
+      {bantKalemleri.length > 0 && (
+        <div className="bant-kapsayici -mx-4 flex items-center gap-3 overflow-hidden bg-accent py-3 text-accent-fg">
+          <AlertTriangle
+            size={20}
+            strokeWidth={1.75}
+            aria-hidden
+            className="ml-4 shrink-0"
+          />
+          <div className="flex min-w-0 flex-1 overflow-hidden">
+            {[0, 1].map((kopya) => (
+              <ul key={kopya} className="bant-parca flex shrink-0 gap-6 pr-6" aria-hidden={kopya === 1}>
+                {bantKalemleri.map((ilan) => (
+                  <li key={ilan.id} className="shrink-0 text-sm font-semibold whitespace-nowrap">
+                    <Link href={`/ilan/${ilan.slug}`} className="underline underline-offset-2">
+                      {ilan.baslik}
+                    </Link>{" "}
+                    <span className="sayisal">{kalanGun(dateOf(ilan.sinavTarihi), simdi)}</span>
+                  </li>
+                ))}
+              </ul>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* §5 V2 kahraman: magazin künyesi — logo solda büyük, manşet sağda. */}
       {oneCikan && (
-        <div className="-mx-4 flex items-center gap-3 bg-accent px-4 py-3 text-accent-fg">
-          <AlertTriangle size={20} strokeWidth={1.75} aria-hidden className="shrink-0" />
-          <p className="text-sm font-semibold">
-            <span className="sayisal">{kalanGun(dateOf(oneCikan.sinavTarihi), simdi)}</span> ·{" "}
-            <Link href={`/ilan/${oneCikan.slug}`} className="underline underline-offset-2">
-              {oneCikan.baslik}
+        <div className="kunye-zemin -mx-4 flex flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:px-6">
+          {oneCikan.kurum.logoUrl ? (
+            <span className="logo-plaka flex h-14 shrink-0 items-center rounded-md px-3 sm:h-20">
+              <Image
+                src={oneCikan.kurum.logoUrl}
+                alt={oneCikan.kurum.ad}
+                width={160}
+                height={80}
+                className="max-h-full w-auto object-contain"
+              />
+            </span>
+          ) : (
+            <span
+              aria-hidden
+              style={kurumRengi(oneCikan.kurum.slug)}
+              className="kurum-amblem-seridi flex size-14 shrink-0 items-center justify-center rounded-md sm:size-20"
+            >
+              <span className="font-baslik text-2xl font-bold text-surface">
+                {oneCikan.kurum.ad.charAt(0).toLocaleUpperCase("tr-TR")}
+              </span>
+            </span>
+          )}
+
+          <div className="flex min-w-0 flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge varyant="vurgu">Kapak</Badge>
+              <Link
+                href={`/yayinevi/${oneCikan.kurum.slug}`}
+                className="text-sm text-text-muted hover:underline"
+              >
+                {oneCikan.kurum.ad}
+              </Link>
+            </div>
+
+            <Link href={`/ilan/${oneCikan.slug}`}>
+              <h1 className="font-baslik text-3xl leading-none text-text hover:underline">
+                {oneCikan.baslik}
+              </h1>
             </Link>
-          </p>
+
+            <p className="sayisal text-lg text-text">
+              {formatTarihAralik(
+                dateOf(oneCikan.sinavTarihi),
+                oneCikan.sinavBitisTarihi ? dateOf(oneCikan.sinavBitisTarihi) : null,
+              )}{" "}
+              · {kalanGun(dateOf(oneCikan.sinavTarihi), simdi)}
+            </p>
+          </div>
         </div>
       )}
 
       {oneCikan && (
         <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-          {/* Öne çıkan ilan büyük kart. */}
-          <Card className="relative overflow-hidden">
-            <span
-              aria-hidden
-              style={kurumRengi(oneCikan.kurum.slug)}
-              className="kurum-zemin absolute inset-x-0 top-0 h-2"
-            />
-            <CardGovde className="flex flex-col gap-3 p-5 pt-6">
-              <div className="flex items-center gap-2">
-                <span
-                  aria-hidden
-                  style={kurumRengi(oneCikan.kurum.slug)}
-                  className="kurum-zemin size-3 rounded-sm"
-                />
-                <Link
-                  href={`/yayinevi/${oneCikan.kurum.slug}`}
-                  className="text-sm text-text-muted hover:underline"
-                >
-                  {oneCikan.kurum.ad}
-                </Link>
-              </div>
-
-              <Link href={`/ilan/${oneCikan.slug}`}>
-                <h2 className="font-baslik text-2xl text-text hover:underline">
-                  {oneCikan.baslik}
-                </h2>
-              </Link>
-
-              <p className="sayisal text-lg text-text">
-                {formatTarihAralik(
-                  dateOf(oneCikan.sinavTarihi),
-                  oneCikan.sinavBitisTarihi ? dateOf(oneCikan.sinavBitisTarihi) : null,
-                )}
-              </p>
-
-              <div className="flex flex-wrap gap-1">
-                <Badge varyant="vurgu">{kalanGun(dateOf(oneCikan.sinavTarihi), simdi)}</Badge>
-                <Badge varyant="cizgi">{oneCikan.format.ad}</Badge>
-                {oneCikan.duzeyler.slice(0, 3).map((duzey) => (
-                  <Badge key={duzey.id} varyant="notr">
-                    {duzey.ad}
-                  </Badge>
-                ))}
-              </div>
-            </CardGovde>
-          </Card>
+          {/* Öne çıkan ilanın kendisi ortak kartla — künye zaten manşeti verdi. */}
+          <IlanKarti ilan={oneCikan} simdi={simdi} />
 
           <div className="flex flex-col gap-2">
             <h3 className="font-baslik text-lg text-text">Yaklaşanlar</h3>
@@ -113,26 +145,16 @@ export function AnaSayfaV2({
       )}
 
       {/* §5 V2: büyük yayınevi logo duvarı — markalar baskın. */}
-      <section className="flex flex-col gap-3">
+      <ScrollBelir as="section" hareket="kayar" className="flex flex-col gap-3">
         <h2 className="font-baslik text-xl text-text">Yayınevleri</h2>
         <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
           {kurumlar.map((kurum) => (
             <li key={kurum.id}>
-              <Link
-                href={`/yayinevi/${kurum.slug}`}
-                className="flex h-20 flex-col items-center justify-center gap-2 rounded-md border border-border bg-surface p-2 text-center transition-colors hover:bg-surface-hover"
-              >
-                <span
-                  aria-hidden
-                  style={kurumRengi(kurum.slug)}
-                  className="kurum-zemin size-6 rounded-md"
-                />
-                <span className="line-clamp-1 text-xs text-text">{kurum.ad}</span>
-              </Link>
+              <KurumAmblemi kurum={kurum} />
             </li>
           ))}
         </ul>
-      </section>
+      </ScrollBelir>
 
       <section className="flex flex-col gap-3">
         <div className="flex items-baseline justify-between">
@@ -142,8 +164,10 @@ export function AnaSayfaV2({
           </Link>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
-          {yaklasan.slice(0, 4).map((ilan) => (
-            <IlanKarti key={ilan.id} ilan={ilan} simdi={simdi} />
+          {yaklasan.slice(0, 4).map((ilan, index) => (
+            <ScrollBelir key={ilan.id} hareket="kayar" gecikme={(index % 2) * 80}>
+              <IlanKarti ilan={ilan} simdi={simdi} />
+            </ScrollBelir>
           ))}
         </div>
       </section>

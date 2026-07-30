@@ -193,17 +193,26 @@ async function koleksiyonlariYaz(etiketHaritasi: Map<string, string>): Promise<v
     duzeyIds: [zorunlu(etiketHaritasi, `DUZEY:${slug}`)],
   });
 
-  const koleksiyonlar: { ad: string; filtre: ReturnType<typeof grup>; ikon?: string }[] = [
+  // Sınıf sekmeleri (4.-11. Sınıf) üst bardaki "Düzey seç" seçiciyle aynı işi
+  // yapıyor — ikisi birden gereksiz tekrar. Koleksiyon kaydı kalıyor (ör.
+  // /k/11-sinif hâlâ çalışır, ileride ana sayfa bloğu olarak kullanılabilir),
+  // yalnızca üst bar menüsünden kaldırılıyor (`menudeMi: false`).
+  const koleksiyonlar: {
+    ad: string;
+    filtre: ReturnType<typeof grup>;
+    ikon?: string;
+    menudeMi?: boolean;
+  }[] = [
     { ad: "YKS", filtre: grup("yks") },
     { ad: "LGS", filtre: grup("lgs") },
-    { ad: "11. Sınıf", filtre: duzey("11-sinif") },
-    { ad: "10. Sınıf", filtre: duzey("10-sinif") },
-    { ad: "9. Sınıf", filtre: duzey("9-sinif") },
-    { ad: "8. Sınıf", filtre: duzey("8-sinif") },
-    { ad: "7. Sınıf", filtre: duzey("7-sinif") },
-    { ad: "6. Sınıf", filtre: duzey("6-sinif") },
-    { ad: "5. Sınıf", filtre: duzey("5-sinif") },
-    { ad: "4. Sınıf", filtre: duzey("4-sinif") },
+    { ad: "11. Sınıf", filtre: duzey("11-sinif"), menudeMi: false },
+    { ad: "10. Sınıf", filtre: duzey("10-sinif"), menudeMi: false },
+    { ad: "9. Sınıf", filtre: duzey("9-sinif"), menudeMi: false },
+    { ad: "8. Sınıf", filtre: duzey("8-sinif"), menudeMi: false },
+    { ad: "7. Sınıf", filtre: duzey("7-sinif"), menudeMi: false },
+    { ad: "6. Sınıf", filtre: duzey("6-sinif"), menudeMi: false },
+    { ad: "5. Sınıf", filtre: duzey("5-sinif"), menudeMi: false },
+    { ad: "4. Sınıf", filtre: duzey("4-sinif"), menudeMi: false },
     { ad: "KPSS", filtre: grup("kpss") },
     { ad: "TUS", filtre: grup("tus") },
     { ad: "DUS", filtre: grup("dus") },
@@ -212,10 +221,11 @@ async function koleksiyonlariYaz(etiketHaritasi: Map<string, string>): Promise<v
 
   for (const [sira, koleksiyon] of koleksiyonlar.entries()) {
     const slug = slugla(koleksiyon.ad);
+    const menudeMi = koleksiyon.menudeMi ?? true;
     await prisma.koleksiyon.upsert({
       where: { slug },
-      update: { ad: koleksiyon.ad, sira, filtre: koleksiyon.filtre },
-      create: { ad: koleksiyon.ad, slug, sira, filtre: koleksiyon.filtre },
+      update: { ad: koleksiyon.ad, sira, filtre: koleksiyon.filtre, menudeMi },
+      create: { ad: koleksiyon.ad, slug, sira, filtre: koleksiyon.filtre, menudeMi },
     });
   }
   console.log(`${koleksiyonlar.length} koleksiyon.`);

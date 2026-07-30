@@ -1,5 +1,6 @@
 "use client";
 
+import { ListChecks } from "lucide-react";
 import { useTransition } from "react";
 import { duzeySec } from "@/app/tercih-actions";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,12 @@ export function DuzeyKarsilama({ duzeyler }: { duzeyler: DuzeySecenegi[] }) {
 
   return (
     <Card className="mx-auto max-w-2xl p-5">
-      <h2 className="text-center font-baslik text-xl font-semibold text-text">Hangi düzeydesin?</h2>
+      <div className="mx-auto flex size-10 items-center justify-center rounded-md bg-accent">
+        <ListChecks size={20} strokeWidth={1.75} aria-hidden className="text-accent-fg" />
+      </div>
+      <h2 className="mt-3 text-center font-baslik text-xl font-semibold text-text">
+        Hangi düzeydesin?
+      </h2>
       <p className="mt-1 text-center text-sm text-text-muted">
         Seçtiğin düzey tüm sayfalarda varsayılan filtren olur. İstediğin zaman değiştirebilirsin.
       </p>

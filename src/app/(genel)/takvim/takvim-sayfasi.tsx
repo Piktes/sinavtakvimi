@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { TakvimKabugu } from "@/components/takvim/takvim-kabugu";
 import { urldenFiltreOku, type Siralama } from "@/components/takvim/filtre-mantigi";
 import type { Prisma } from "@/generated/prisma/client";
@@ -65,6 +67,17 @@ export async function TakvimSayfasi({
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Kullanıcı /takvim'e "Takvimin tamamı" ile geldiğinde ana sayfaya
+       * (kahraman bölümü + kayan şerit) dönüşün açıkça görünür bir yolu
+       * olsun diye — üst bardaki logoya güvenmek yeterli değildi. */}
+      <Link
+        href="/"
+        className="flex w-fit items-center gap-1 text-sm text-text-muted hover:text-text hover:underline"
+      >
+        <ArrowLeft size={16} strokeWidth={1.75} aria-hidden />
+        Ana sayfa
+      </Link>
+
       {(baslik || baslikEylemi) && (
         <div className="flex flex-wrap items-center justify-between gap-2">
           {baslik && <h2 className="font-baslik text-2xl font-semibold text-text">{baslik}</h2>}

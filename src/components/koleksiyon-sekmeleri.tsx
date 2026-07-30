@@ -19,27 +19,20 @@ export function KoleksiyonSekmeleri({ koleksiyonlar }: { koleksiyonlar: Koleksiy
 
   return (
     <nav aria-label="Koleksiyonlar" className="border-t border-border">
-      <ul className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 py-1">
-        <li>
-          <Link
-            href="/takvim"
-            className={cn(
-              "inline-flex h-8 items-center rounded-sm px-3 text-sm whitespace-nowrap text-text-muted transition-colors hover:bg-surface-hover",
-              yol === "/takvim" && "bg-bg-subtle font-medium text-text",
-            )}
-          >
-            Tümü
-          </Link>
-        </li>
+      <ul className="serit-orta mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 py-1">
         {koleksiyonlar.map((koleksiyon) => {
           const hedef = `/k/${koleksiyon.slug}`;
           return (
             <li key={koleksiyon.id}>
               <Link
                 href={hedef}
+                data-etiket={koleksiyon.ad}
+                aria-current={yol === hedef ? "page" : undefined}
                 className={cn(
-                  "inline-flex h-8 items-center rounded-sm px-3 text-sm whitespace-nowrap text-text-muted transition-colors hover:bg-surface-hover",
-                  yol === hedef && "bg-bg-subtle font-medium text-text",
+                  "gezinme-bagi inline-flex h-8 items-center rounded-sm px-3 text-sm whitespace-nowrap text-text-muted hover:bg-surface-hover hover:text-text",
+                  // Seçili sekme belirgin kalsın: yalnızca hafif zemin değil,
+                  // birincil renkte dolgu (§3.5 anlamsal token).
+                  yol === hedef && "bg-primary font-medium text-primary-fg hover:bg-primary-hover hover:text-primary-fg",
                 )}
               >
                 {koleksiyon.ad}
