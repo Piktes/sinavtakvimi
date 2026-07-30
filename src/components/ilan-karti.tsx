@@ -44,9 +44,7 @@ export function IlanKarti({ ilan, simdi }: { ilan: IlanOzet; simdi: Date }) {
               {ilan.dagiticiKurum && <> · Dağıtım: {ilan.dagiticiKurum.ad}</>}
             </p>
           </div>
-          <span className="sayisal shrink-0 text-sm text-text-muted">
-            {kalanGun(sinav, simdi)}
-          </span>
+          <span className="sayisal shrink-0 text-sm text-text-muted">{kalanGun(sinav, simdi)}</span>
         </div>
 
         <p className="sayisal text-sm text-text">{formatTarihAralik(sinav, bitis)}</p>

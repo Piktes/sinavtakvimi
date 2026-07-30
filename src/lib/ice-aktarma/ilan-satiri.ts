@@ -275,9 +275,7 @@ export function satiriCoz(
       uygulamaTipi: uygulamaTipi!,
       zorluk,
       seriNo,
-      sezon:
-        al("sezon") ||
-        sezonTuret(new Date(`${cozulmusSinavTarihi}T00:00:00.000Z`)),
+      sezon: al("sezon") || sezonTuret(new Date(`${cozulmusSinavTarihi}T00:00:00.000Z`)),
       detayUrl: detayUrl || null,
       aciklama: al("aciklama") || null,
     },

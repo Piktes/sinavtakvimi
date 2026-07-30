@@ -118,7 +118,13 @@ export function IlanFormu({
             <Input id="slug" name="slug" defaultValue={ilan?.slug ?? ""} />
           </Alan>
           <Alan ad="seriNo" etiket="Seri no" hata={durum.alanHatalari?.seriNo}>
-            <Input id="seriNo" name="seriNo" type="number" min={1} defaultValue={ilan?.seriNo ?? ""} />
+            <Input
+              id="seriNo"
+              name="seriNo"
+              type="number"
+              min={1}
+              defaultValue={ilan?.seriNo ?? ""}
+            />
           </Alan>
         </div>
 
@@ -232,7 +238,12 @@ export function IlanFormu({
             />
           </Alan>
           <Alan ad="sezon" etiket="Sezon (boşsa sınav tarihinden türetilir)">
-            <Input id="sezon" name="sezon" defaultValue={ilan?.sezon ?? ""} placeholder="2026-2027" />
+            <Input
+              id="sezon"
+              name="sezon"
+              defaultValue={ilan?.sezon ?? ""}
+              placeholder="2026-2027"
+            />
           </Alan>
         </div>
       </Bolum>
@@ -281,18 +292,14 @@ export function IlanFormu({
                       min={1}
                       placeholder="Soru"
                       value={oturum.soruSayisi}
-                      onChange={(o) =>
-                        oturumGuncelle(oturum.anahtar, "soruSayisi", o.target.value)
-                      }
+                      onChange={(o) => oturumGuncelle(oturum.anahtar, "soruSayisi", o.target.value)}
                     />
                     <Button
                       type="button"
                       varyant="tehlike"
                       boyut="sm"
                       onClick={() =>
-                        setOturumlar((onceki) =>
-                          onceki.filter((o) => o.anahtar !== oturum.anahtar),
-                        )
+                        setOturumlar((onceki) => onceki.filter((o) => o.anahtar !== oturum.anahtar))
                       }
                     >
                       Sil
@@ -348,7 +355,11 @@ export function IlanFormu({
           </Alan>
 
           <Alan ad="yayinDurumu" etiket="Yayın durumu" hata={durum.alanHatalari?.yayinDurumu}>
-            <Select id="yayinDurumu" name="yayinDurumu" defaultValue={ilan?.yayinDurumu ?? "TASLAK"}>
+            <Select
+              id="yayinDurumu"
+              name="yayinDurumu"
+              defaultValue={ilan?.yayinDurumu ?? "TASLAK"}
+            >
               <option value="TASLAK">Taslak</option>
               <option value="YAYINDA">Yayında</option>
               <option value="ARSIV">Arşiv</option>
@@ -369,15 +380,30 @@ export function IlanFormu({
         </div>
 
         <Alan ad="detayUrl" etiket="Yayınevi sayfası (URL)" hata={durum.alanHatalari?.detayUrl}>
-          <Input id="detayUrl" name="detayUrl" defaultValue={ilan?.detayUrl ?? ""} placeholder="https://" />
+          <Input
+            id="detayUrl"
+            name="detayUrl"
+            defaultValue={ilan?.detayUrl ?? ""}
+            placeholder="https://"
+          />
         </Alan>
 
         <Alan ad="afisUrl" etiket="Afiş görseli (URL)" hata={durum.alanHatalari?.afisUrl}>
-          <Input id="afisUrl" name="afisUrl" defaultValue={ilan?.afisUrl ?? ""} placeholder="https://" />
+          <Input
+            id="afisUrl"
+            name="afisUrl"
+            defaultValue={ilan?.afisUrl ?? ""}
+            placeholder="https://"
+          />
         </Alan>
 
         <Alan ad="aciklamaMd" etiket="Açıklama">
-          <Textarea id="aciklamaMd" name="aciklamaMd" rows={4} defaultValue={ilan?.aciklamaMd ?? ""} />
+          <Textarea
+            id="aciklamaMd"
+            name="aciklamaMd"
+            rows={4}
+            defaultValue={ilan?.aciklamaMd ?? ""}
+          />
         </Alan>
       </Bolum>
 

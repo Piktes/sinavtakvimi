@@ -34,7 +34,5 @@ export default async function AylikTakvim({
   const cozulen = parcalariCoz(yil, ay);
   if (!cozulen) notFound();
 
-  return (
-    <TakvimSayfasi yil={cozulen.yil} ay={cozulen.ay} aramaParametreleri={parametreler} />
-  );
+  return <TakvimSayfasi yil={cozulen.yil} ay={cozulen.ay} aramaParametreleri={parametreler} />;
 }

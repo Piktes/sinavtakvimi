@@ -127,7 +127,11 @@ export function EtiketYonetimi({ etiketler }: { etiketler: EtiketSatiri[] }) {
             </div>
 
             {/* key: düzenlenen değişince form alanları sıfırlansın. */}
-            <form key={duzenlenen?.id ?? `yeni-${aktifTip}`} action={eylem} className="flex flex-col gap-3">
+            <form
+              key={duzenlenen?.id ?? `yeni-${aktifTip}`}
+              action={eylem}
+              className="flex flex-col gap-3"
+            >
               <input type="hidden" name="id" value={duzenlenen?.id ?? ""} />
               <input type="hidden" name="tip" value={duzenlenen?.tip ?? aktifTip} />
 
@@ -144,11 +148,7 @@ export function EtiketYonetimi({ etiketler }: { etiketler: EtiketSatiri[] }) {
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="etiket-kisaAd">Kısa ad</Label>
-                  <Input
-                    id="etiket-kisaAd"
-                    name="kisaAd"
-                    defaultValue={duzenlenen?.kisaAd ?? ""}
-                  />
+                  <Input id="etiket-kisaAd" name="kisaAd" defaultValue={duzenlenen?.kisaAd ?? ""} />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="etiket-sira">Sıra</Label>

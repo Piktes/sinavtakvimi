@@ -93,9 +93,7 @@ export function AylikIzgara({
     olay.preventDefault();
     const yeni = suAn + adim;
     if (yeni < 1 || yeni > gunSayisi) return;
-    izgaraRef.current
-      ?.querySelector<HTMLElement>(`[data-gun="${yeni}"]`)
-      ?.focus();
+    izgaraRef.current?.querySelector<HTMLElement>(`[data-gun="${yeni}"]`)?.focus();
   }
 
   return (
@@ -120,7 +118,11 @@ export function AylikIzgara({
 
       <div role="rowgroup" className="grid grid-cols-7">
         {Array.from({ length: baslangicBoslugu }).map((_, index) => (
-          <div key={`bosluk-${index}`} role="gridcell" className="min-h-24 border-b border-r border-border bg-bg-subtle" />
+          <div
+            key={`bosluk-${index}`}
+            role="gridcell"
+            className="min-h-24 border-b border-r border-border bg-bg-subtle"
+          />
         ))}
 
         {Array.from({ length: gunSayisi }, (_, index) => index + 1).map((gun) => {

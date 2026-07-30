@@ -27,8 +27,8 @@ export default async function EtiketlerSayfasi() {
       <div>
         <h1 className="font-baslik text-2xl font-semibold text-text">Etiketler</h1>
         <p className="text-sm text-text-muted">
-          İlanların sınıflandırması. Buraya eklenen her etiket ilan formunda ve filtrelerde
-          anında görünür.
+          İlanların sınıflandırması. Buraya eklenen her etiket ilan formunda ve filtrelerde anında
+          görünür.
         </p>
       </div>
 
@@ -43,9 +43,7 @@ export default async function EtiketlerSayfasi() {
           aktifMi: etiket.aktifMi,
           // Etiket üç rolde birden kullanılabilir; hepsini topluyoruz.
           kullanim:
-            etiket._count.grupIlanlari +
-            etiket._count.formatIlanlari +
-            etiket._count.duzeyIlanlari,
+            etiket._count.grupIlanlari + etiket._count.formatIlanlari + etiket._count.duzeyIlanlari,
         }))}
       />
     </div>

@@ -30,10 +30,7 @@ export function ilanlariFiltrele(ilanlar: IlanOzet[], filtre: AktifFiltre): Ilan
     if (filtre.zorluklar.length && (!ilan.zorluk || !filtre.zorluklar.includes(ilan.zorluk))) {
       return false;
     }
-    if (
-      filtre.uygulamaTipleri.length &&
-      !filtre.uygulamaTipleri.includes(ilan.uygulamaTipi)
-    ) {
+    if (filtre.uygulamaTipleri.length && !filtre.uygulamaTipleri.includes(ilan.uygulamaTipi)) {
       return false;
     }
     if (

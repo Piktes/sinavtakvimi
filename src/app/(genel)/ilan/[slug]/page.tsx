@@ -50,9 +50,7 @@ export default async function IlanDetay({ params }: { params: Promise<{ slug: st
     "@type": "Event",
     name: ilan.baslik,
     startDate: ilan.sinavTarihi.toISOString().slice(0, 10),
-    ...(ilan.sinavBitisTarihi
-      ? { endDate: ilan.sinavBitisTarihi.toISOString().slice(0, 10) }
-      : {}),
+    ...(ilan.sinavBitisTarihi ? { endDate: ilan.sinavBitisTarihi.toISOString().slice(0, 10) } : {}),
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     organizer: { "@type": "Organization", name: ilan.kurum.ad },
   };
@@ -72,7 +70,10 @@ export default async function IlanDetay({ params }: { params: Promise<{ slug: st
             style={kurumRengi(ilan.kurum.slug)}
             className="kurum-zemin size-3 rounded-sm"
           />
-          <Link href={`/yayinevi/${ilan.kurum.slug}`} className="text-sm text-text-muted hover:underline">
+          <Link
+            href={`/yayinevi/${ilan.kurum.slug}`}
+            className="text-sm text-text-muted hover:underline"
+          >
             {ilan.kurum.ad}
           </Link>
         </div>
@@ -133,10 +134,7 @@ export default async function IlanDetay({ params }: { params: Promise<{ slug: st
               <Satir etiket="Son sipariş" deger={formatTarih(ilan.sonSiparisTarihi)} />
             )}
             {ilan.cevapAnahtariZamani && (
-              <Satir
-                etiket="Cevap anahtarı"
-                deger={formatTarihSaat(ilan.cevapAnahtariZamani)}
-              />
+              <Satir etiket="Cevap anahtarı" deger={formatTarihSaat(ilan.cevapAnahtariZamani)} />
             )}
             {ilan.dagiticiKurum && (
               <Satir

@@ -18,8 +18,7 @@ export default async function SifreDegistirSayfasi() {
           <div className="flex flex-col gap-1">
             <h1 className="font-baslik text-xl font-semibold text-text">Şifre değiştir</h1>
             <p className="text-sm text-text-muted">
-              Devam etmeden önce şifrenizi belirleyin. En az 8 karakter, büyük ve küçük harf,
-              rakam.
+              Devam etmeden önce şifrenizi belirleyin. En az 8 karakter, büyük ve küçük harf, rakam.
             </p>
           </div>
           <SifreFormu />

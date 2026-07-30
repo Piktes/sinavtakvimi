@@ -6,11 +6,7 @@ import { KurumFormu } from "../kurum-formu";
 
 export const metadata: Metadata = { title: "Kurumu düzenle" };
 
-export default async function KurumDuzenleSayfasi({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function KurumDuzenleSayfasi({ params }: { params: Promise<{ id: string }> }) {
   await requireRol(["ADMIN", "EDITOR"]);
   const { id } = await params;
 

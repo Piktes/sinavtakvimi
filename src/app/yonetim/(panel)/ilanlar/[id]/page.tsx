@@ -20,11 +20,7 @@ function yerelZamanDegeri(tarih: Date | null): string | null {
   return new Date(tarih.getTime() + 3 * 60 * 60 * 1000).toISOString().slice(0, 16);
 }
 
-export default async function IlanDuzenleSayfasi({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function IlanDuzenleSayfasi({ params }: { params: Promise<{ id: string }> }) {
   await requireRol(["ADMIN", "EDITOR"]);
   const { id } = await params;
 

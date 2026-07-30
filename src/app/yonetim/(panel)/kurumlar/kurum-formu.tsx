@@ -41,7 +41,9 @@ export function KurumFormu({
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="ad">Ad</Label>
             <Input id="ad" name="ad" defaultValue={kurum?.ad} required />
-            {durum.alanHatalari?.ad && <p className="text-sm text-danger">{durum.alanHatalari.ad}</p>}
+            {durum.alanHatalari?.ad && (
+              <p className="text-sm text-danger">{durum.alanHatalari.ad}</p>
+            )}
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
@@ -117,7 +119,12 @@ export function KurumFormu({
 
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="aciklamaMd">Açıklama</Label>
-            <Textarea id="aciklamaMd" name="aciklamaMd" rows={3} defaultValue={kurum?.aciklamaMd ?? ""} />
+            <Textarea
+              id="aciklamaMd"
+              name="aciklamaMd"
+              rows={3}
+              defaultValue={kurum?.aciklamaMd ?? ""}
+            />
           </div>
 
           <label className="flex items-center gap-2 text-sm text-text">

@@ -150,7 +150,11 @@ export function TakvimKabugu({
                   Filtreleri temizle
                 </Button>
               )}
-              <Button varyant="hayalet" boyut="sm" onClick={() => yonlendirici.push(ayBagi(sonrakiAy))}>
+              <Button
+                varyant="hayalet"
+                boyut="sm"
+                onClick={() => yonlendirici.push(ayBagi(sonrakiAy))}
+              >
                 Sonraki aya bak
               </Button>
             </div>

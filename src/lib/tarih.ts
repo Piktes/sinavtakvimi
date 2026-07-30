@@ -126,7 +126,8 @@ export function kalanGun(hedef: Date, simdi: Date): string {
 // Gün sayısı — rozet/eşik mantığı için (ör. kayan şeritte 7 gün filtresi).
 export function kalanGunSayisi(hedef: Date, simdi: Date): number {
   return Math.round(
-    (Date.parse(`${gunAnahtari(hedef)}T00:00:00Z`) - Date.parse(`${gunAnahtari(simdi)}T00:00:00Z`)) /
+    (Date.parse(`${gunAnahtari(hedef)}T00:00:00Z`) -
+      Date.parse(`${gunAnahtari(simdi)}T00:00:00Z`)) /
       86_400_000,
   );
 }

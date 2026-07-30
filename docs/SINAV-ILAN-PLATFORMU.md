@@ -44,18 +44,18 @@ Dağıtım: İşler Kitabevleri
 
 ## 1. Teknoloji
 
-| Katman | Seçim |
-|---|---|
-| Framework | Next.js 15 App Router + TypeScript |
-| Stil | Tailwind CSS v4 + CSS değişken katmanı |
-| Bileşen | shadcn/ui |
-| Animasyon | Motion (framer-motion) |
-| İkon | Lucide React — **tek ikon ailesi, başkası kullanılmayacak** |
-| Veritabanı | PostgreSQL 16 + Prisma |
-| Kimlik | Auth.js v5, database session |
-| Kuyruk | pg-boss (Redis yok — Windows'ta gereksiz bağımlılık) |
-| E-posta | Nodemailer + React Email |
-| Doğrulama | Zod, uçtan uca paylaşımlı |
+| Katman     | Seçim                                                       |
+| ---------- | ----------------------------------------------------------- |
+| Framework  | Next.js 15 App Router + TypeScript                          |
+| Stil       | Tailwind CSS v4 + CSS değişken katmanı                      |
+| Bileşen    | shadcn/ui                                                   |
+| Animasyon  | Motion (framer-motion)                                      |
+| İkon       | Lucide React — **tek ikon ailesi, başkası kullanılmayacak** |
+| Veritabanı | PostgreSQL 16 + Prisma                                      |
+| Kimlik     | Auth.js v5, database session                                |
+| Kuyruk     | pg-boss (Redis yok — Windows'ta gereksiz bağımlılık)        |
+| E-posta    | Nodemailer + React Email                                    |
+| Doğrulama  | Zod, uçtan uca paylaşımlı                                   |
 
 Geliştirme Windows, yayın Ubuntu VPS. Dosya adları küçük harf-tire, import yolları birebir (Linux harf duyarlı). Yollar `path.join()`. `.gitattributes` ile LF.
 
@@ -136,6 +136,7 @@ DenetimKaydi
 ```
 
 **Kurallar:**
+
 - Tüm zamanlar DB'de UTC, arayüzde Europe/Istanbul (UTC+3 sabit). Tek dönüştürme modülü.
 - `sinavBitisTarihi` doluysa `sinavTarihi`'nden büyük — Zod + DB CHECK.
 - `sezon` boşsa `sinavTarihi`'nden türetilir (kesme noktası 1 Ağustos): 30.10.2026 → "2026-2027".
@@ -155,16 +156,19 @@ DenetimKaydi
 Hiçbir görsel değer bileşen içinde yazılmayacak. Renk, boşluk, yarıçap, gölge, tipografi — hepsi CSS değişkeninden okunur.
 
 **Yasak, istisnasız:**
+
 - Bileşen içinde hex kodu: `#2563EB`, `rgb(...)`, `hsl(...)`
 - Tailwind serbest değer: `p-[13px]`, `text-[15px]`, `w-[347px]`, `bg-[#fff]`
 - Satır içi `style={{ color: ... }}`
 - Ölçekte olmayan boşluk veya font boyutu
 
 **Doğrulama, her commit öncesi çalıştırılacak:**
+
 ```bash
 grep -rEn "#[0-9a-fA-F]{3,8}\b" src/ --include=*.tsx --include=*.ts | grep -v "tokens/"
 grep -rEn "\[[0-9]+px\]|\[#" src/ --include=*.tsx
 ```
+
 İkisi de boş dönmeli. `styles/tokens/` dışında hex bulunması hatadır.
 
 ### 3.2 Boşluk — 4px tabanlı, 8 basamak
@@ -173,6 +177,7 @@ grep -rEn "\[[0-9]+px\]|\[#" src/ --include=*.tsx
 --space-1: 4px    --space-2: 8px    --space-3: 12px   --space-4: 16px
 --space-5: 24px   --space-6: 32px   --space-7: 48px   --space-8: 64px
 ```
+
 Ara değer yok. 20px gerekiyorsa 16 veya 24 seçilir.
 
 ### 3.3 Tipografi — 7 basamak, ölçek dışına çıkılmaz
@@ -186,6 +191,7 @@ Ara değer yok. 20px gerekiyorsa 16 veya 24 seçilir.
 --text-2xl:  32px / 1.2    sayfa başlığı
 --text-3xl:  48px / 1.1    kahraman
 ```
+
 Ağırlık yalnızca 400, 500, 600, 700. 300 ve 800 kullanılmayacak.
 
 **Sayısal içerik** (tarih, geri sayım, süre, soru sayısı) daima monospace ve `font-variant-numeric: tabular-nums` — geri sayım titrememesi için işlevsel zorunluluk.
@@ -228,6 +234,7 @@ function kurumTonu(slug: string): number {
 // Kullanım: hsl(var(--kurum-h) 65% 45%) — doygunluk ve açıklık SABİT,
 // yalnızca ton değişir. Böylece 45 renk birbiriyle uyumlu kalır.
 ```
+
 Doygunluk/açıklık sabitlenmesi kritik: rastgele HSL üçlüsü kullanılırsa palet dağılır.
 
 ### 3.7 Tek bileşen kuralı
@@ -235,6 +242,7 @@ Doygunluk/açıklık sabitlenmesi kritik: rastgele HSL üçlüsü kullanılırsa
 Aynı işi yapan iki bileşen bulunmayacak. Uygulamada **tek** `Card`, **tek** `Badge`, **tek** `Button`, **tek** `Select`, **tek** `EmptyState`, **tek** `Skeleton` vardır. Varyasyon prop ile yapılır, kopya bileşenle değil.
 
 **Tarih biçimlendirme tek fonksiyondan geçer.** Hiçbir bileşende `toLocaleDateString` çağrılmayacak:
+
 ```ts
 formatTarih(d)                  → "30 Ekim 2026"
 formatTarihAralik(a, b)         → "30 Ekim – 1 Kasım 2026"
@@ -253,6 +261,7 @@ kalanGun(d)                     → "23 gün kaldı" | "Yarın" | "Bugün"
 --ease: cubic-bezier(0.32, 0.72, 0, 1)
 --dur-fast: 120ms    --dur-base: 200ms    --dur-slow: 400ms
 ```
+
 `prefers-reduced-motion: reduce` altında tüm süreler 0'a iner — tek yerde, global CSS'te.
 
 ### 3.9 Tutarlılık kontrol listesi (commit öncesi)
@@ -298,22 +307,24 @@ Sezonda 1000+ ilan. Kullanıcı **bu ay kendisini ilgilendiren 4 ilanı 10 saniy
 - Ay değiştiğinde sunucudan yeni veri, `Suspense` ile akış halinde
 
 **Filtre çubuğu:**
+
 ```
 Görünüm: [Aylık] Liste Haftalık        Sırala: [Tarih] Yayınevi
 Yayınevi ▾  Format ▾  Zorluk ▾  T.Geneli/Kurumsal ▾
 Aktif: (Özdebir ×) (TYT-AYT ×)                          Temizle
 ```
+
 - Yayınevi seçici: arama kutusu + logo ızgarası, çoklu seçim. 45 kurum için metin listesi kullanılmaz — öğrenci markayı logodan tanır.
 - Aktif filtreler rozet olarak görünür, tek tıkla kalkar.
 - Kaydırınca filtre çubuğu yapışır ve tek satıra iner.
 
 ### 4.4 Görünümler
 
-| Görünüm | Varsayılan | Davranış |
-|---|---|---|
-| **Aylık ızgara** | Masaüstü | Gün hücrelerinde ilan rozetleri (yayınevi tonunda). Hücre üzerine gelince hover kartı: başlık, saat, zorluk. Ok tuşlarıyla gezinilebilir, Enter açar. Tatiller gri bantla. |
-| **Liste** | **Mobil** | Tarih başlıklarıyla gruplu kart akışı. Cumartesi hücresine 6 ilan sığmadığı için mobilde ızgara kullanılmaz. |
-| **Haftalık** | — | Bu hafta + gelecek hafta, saat detaylı |
+| Görünüm          | Varsayılan | Davranış                                                                                                                                                                   |
+| ---------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Aylık ızgara** | Masaüstü   | Gün hücrelerinde ilan rozetleri (yayınevi tonunda). Hücre üzerine gelince hover kartı: başlık, saat, zorluk. Ok tuşlarıyla gezinilebilir, Enter açar. Tatiller gri bantla. |
+| **Liste**        | **Mobil**  | Tarih başlıklarıyla gruplu kart akışı. Cumartesi hücresine 6 ilan sığmadığı için mobilde ızgara kullanılmaz.                                                               |
+| **Haftalık**     | —          | Bu hafta + gelecek hafta, saat detaylı                                                                                                                                     |
 
 Görünüm geçişleri View Transitions API ile; desteklenmeyen tarayıcıda anında geçiş.
 
@@ -405,6 +416,7 @@ Tek kod tabanı, tek API, tek veri katmanı. Fark yalnızca token dosyası ve sa
 **Her üçünde zorunlu:** açık/koyu tema, mobil uyumluluk, kayan şerit, kalıcı düzey filtresi, aynı bileşen kümesi, §3'teki tüm tutarlılık kuralları.
 
 ### V1 — "Ajanda"
+
 Fiziksel okul ajandası. Ay ızgarası kahraman öğe; kullanıcı önce zamanı görür.
 
 - **Açık:** kağıt `#EDEEF0` · mürekkep `#131A24` · işaret `#E03131` · vurgu `#FFD43B`
@@ -414,6 +426,7 @@ Fiziksel okul ajandası. Ay ızgarası kahraman öğe; kullanıcı önce zamanı
 - **Düzen:** Ay ızgarası solda geniş, sağda dar sütunda "en yakın ilan" ve filtreler.
 
 ### V2 — "Vitrin"
+
 Yayınevi markalarının öne çıktığı magazin düzeni. Logolar baskın.
 
 - **Açık:** `#FFFFFF` · `#0B0B0C` · birincil `#2563EB` · uyarı `#F59E0B` · hat `#E4E4E7`
@@ -423,6 +436,7 @@ Yayınevi markalarının öne çıktığı magazin düzeni. Logolar baskın.
 - **Düzen:** Öne çıkan ilan büyük kart, yanında yaklaşanlar listesi, altında logo ızgarası ve kart akışı.
 
 ### V3 — "Akış"
+
 Uygulama gibi, koyu varsayılan, mobil öncelikli akış.
 
 - **Koyu (varsayılan):** `#0E1116` · yüzey `#161B22` · `#E6EDF3` · birincil teal `#14B8A6` · ikincil `#8B5CF6` · aciliyet `#F97316`
@@ -442,6 +456,7 @@ Uygulama gibi, koyu varsayılan, mobil öncelikli akış.
 **Gösterge paneli** — bugünün ziyaretçi/kayıt sayısı, onay bekleyen yorum, yaklaşan 7 gün, son işlemler.
 
 **İlanlar** — asıl iş ekranı.
+
 - Liste: sezon, kurum, grup, format, zorluk, uygulama tipi, yayın durumu filtreleri; varsayılan sıralama sınav tarihi artan
 - Form tek sayfa, §2'deki alanlar. Oturum bölümü varsayılan kapalı.
 - **Önizleme:** yayınlamadan önce ilanın sitede nasıl göründüğü, seçili versiyonda
@@ -483,24 +498,24 @@ Uygulama gibi, koyu varsayılan, mobil öncelikli akış.
 
 **Güvenlik:** argon2id şifre. CSRF. Hız sınırı (giriş, kayıt, yorum). Zod ile **sunucu tarafında her zaman** doğrulama. Kullanıcı içeriği HTML olarak render edilmez. Yükleme: MIME doğrulama, boyut sınırı, yeniden kodlama, EXIF temizliği. CSP, HSTS.
 
-**KVKK:** Hukuki sebep sözleşmenin ifası (m.5/2-c) — bildirim hizmeti için açık rıza gerekmez, böylece küçüklerin rıza ehliyeti tartışması doğmaz. Açık rıza yalnızca analitik çerezi ve pazarlama için, ayrı ve varsayılan kapalı kutularla. 13 yaş beyanı. Ham IP saklanmaz, tuzlanmış hash. Veri indirme ve hesap silme hesap ayarlarından. Altbilgide: *"Bu site resmî bir kurum sitesi değildir. Tarihler ilgili kurumların duyurularından derlenmiştir; bağlayıcı kaynak kurumun kendi duyurusudur."*
+**KVKK:** Hukuki sebep sözleşmenin ifası (m.5/2-c) — bildirim hizmeti için açık rıza gerekmez, böylece küçüklerin rıza ehliyeti tartışması doğmaz. Açık rıza yalnızca analitik çerezi ve pazarlama için, ayrı ve varsayılan kapalı kutularla. 13 yaş beyanı. Ham IP saklanmaz, tuzlanmış hash. Veri indirme ve hesap silme hesap ayarlarından. Altbilgide: _"Bu site resmî bir kurum sitesi değildir. Tarihler ilgili kurumların duyurularından derlenmiştir; bağlayıcı kaynak kurumun kendi duyurusudur."_
 
 ---
 
 ## 8. Yapım sırası
 
-| # | İş | Çıktı |
-|---|---|---|
-| 1 | Şema + migration + seed (81 il yok — gerek kalmadı; etiketler, kurum tipleri, 45 yayınevi) | Veri hazır |
-| 2 | Token katmanı + temel bileşen kümesi (Card, Badge, Button, Select, Skeleton, EmptyState) + `formatTarih*` | Görsel sistem hazır |
-| 3 | 60 demo ilan seed'i (Eylül 2026 – Haziran 2027, birkaçı önümüzdeki 7 gün içinde) | Gerçekçi veri |
-| 4 | **V1 genel site:** takvim (aylık+liste), düzey seçimi, filtre çubuğu, kayan şerit, ilan detay, yayınevi sayfası, açık/koyu | **Gösterilebilir site** |
-| 5 | V2 ve V3 | Üç versiyon |
-| 6 | Admin: giriş, RBAC, ilan CRUD, önizleme, toplu seri girişi | Yönetilebilir |
-| 7 | Admin: kurumlar, etiketler, koleksiyonlar (canlı önizlemeli), takvim notları | Tam yönetim |
-| 8 | Üyelik + bildirim (pg-boss, idempotent) | Bildirim çalışıyor |
-| 9 | Yorum + moderasyon | Topluluk |
-| 10 | Ana sayfa düzeni yönetimi, Excel içe aktarma, analitik | Tamamlama |
+| #   | İş                                                                                                                         | Çıktı                   |
+| --- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| 1   | Şema + migration + seed (81 il yok — gerek kalmadı; etiketler, kurum tipleri, 45 yayınevi)                                 | Veri hazır              |
+| 2   | Token katmanı + temel bileşen kümesi (Card, Badge, Button, Select, Skeleton, EmptyState) + `formatTarih*`                  | Görsel sistem hazır     |
+| 3   | 60 demo ilan seed'i (Eylül 2026 – Haziran 2027, birkaçı önümüzdeki 7 gün içinde)                                           | Gerçekçi veri           |
+| 4   | **V1 genel site:** takvim (aylık+liste), düzey seçimi, filtre çubuğu, kayan şerit, ilan detay, yayınevi sayfası, açık/koyu | **Gösterilebilir site** |
+| 5   | V2 ve V3                                                                                                                   | Üç versiyon             |
+| 6   | Admin: giriş, RBAC, ilan CRUD, önizleme, toplu seri girişi                                                                 | Yönetilebilir           |
+| 7   | Admin: kurumlar, etiketler, koleksiyonlar (canlı önizlemeli), takvim notları                                               | Tam yönetim             |
+| 8   | Üyelik + bildirim (pg-boss, idempotent)                                                                                    | Bildirim çalışıyor      |
+| 9   | Yorum + moderasyon                                                                                                         | Topluluk                |
+| 10  | Ana sayfa düzeni yönetimi, Excel içe aktarma, analitik                                                                     | Tamamlama               |
 
 **Sıra gerekçesi:** Adım 4 sonunda ekranda gerçek veriyle çalışan bir site olur. Veri modelini bitirip aylarca ekran görmemek yerine, üçüncü adımda demo veriyle dördüncü adımda gösterilebilir çıktı alınır. Admin paneli sonra gelir çünkü demo veri seed'den geliyor.
 

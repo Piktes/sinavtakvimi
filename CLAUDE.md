@@ -14,11 +14,11 @@ merkezine** koyar.
 
 ## Önce bunları oku
 
-| Dosya | İçerik |
-|---|---|
-| `docs/SINAV-ILAN-PLATFORMU.md` | **Şartname.** Tüm § referansları buraya. |
-| `DURUM.md` | Ne yapıldı, sırada ne var, bilinen tuzaklar. |
-| `KURULUM.md` | Yeni makinede kurulum + sorun giderme. |
+| Dosya                          | İçerik                                       |
+| ------------------------------ | -------------------------------------------- |
+| `docs/SINAV-ILAN-PLATFORMU.md` | **Şartname.** Tüm § referansları buraya.     |
+| `DURUM.md`                     | Ne yapıldı, sırada ne var, bilinen tuzaklar. |
+| `KURULUM.md`                   | Yeni makinede kurulum + sorun giderme.       |
 
 Bir göreve başlamadan önce şartnamenin ilgili bölümünü oku. Şartnameyle
 çelişen bir durum fark edersen **kod yazmadan önce sor**; sessizce yorumlama.

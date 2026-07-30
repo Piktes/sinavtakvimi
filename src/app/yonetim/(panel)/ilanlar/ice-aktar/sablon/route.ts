@@ -13,7 +13,11 @@ export async function GET() {
   await requireRol(["ADMIN", "EDITOR"]);
 
   const [kurum, grup, format, duzeyler] = await Promise.all([
-    prisma.kurum.findFirst({ where: { aktifMi: true }, select: { ad: true }, orderBy: { ad: "asc" } }),
+    prisma.kurum.findFirst({
+      where: { aktifMi: true },
+      select: { ad: true },
+      orderBy: { ad: "asc" },
+    }),
     prisma.etiket.findFirst({
       where: { tip: "GRUP", aktifMi: true },
       select: { ad: true },

@@ -50,7 +50,9 @@ export function IceAktarmaFormu({ sutunlar }: { sutunlar: SutunTanimi[] }) {
               <Link href="/yonetim/ilanlar/ice-aktar">Yeni dosya yükle</Link>
             </Button>
             {/* §4.2: yanlış dosya yüklendiği hemen fark edilirse tek tıkla dönülebilsin. */}
-            {sonuc.partiId && <GeriAlButonu partiId={sonuc.partiId} etiket="Bu yüklemeyi geri al" />}
+            {sonuc.partiId && (
+              <GeriAlButonu partiId={sonuc.partiId} etiket="Bu yüklemeyi geri al" />
+            )}
           </div>
           <p className="text-xs text-text-muted">
             Geri alma, bu yüklemeden gelen ve hâlâ taslak olan ilanları siler.{" "}
@@ -153,7 +155,8 @@ export function IceAktarmaFormu({ sutunlar }: { sutunlar: SutunTanimi[] }) {
               <p className="text-sm text-danger">{rapor.hata}</p>
               {rapor.eksikSutunlar && (
                 <p className="text-sm text-danger">
-                  Eksik sütunlar: <span className="font-mono">{rapor.eksikSutunlar.join(", ")}</span>
+                  Eksik sütunlar:{" "}
+                  <span className="font-mono">{rapor.eksikSutunlar.join(", ")}</span>
                 </p>
               )}
             </div>
@@ -170,7 +173,11 @@ export function IceAktarmaFormu({ sutunlar }: { sutunlar: SutunTanimi[] }) {
             <div className="grid gap-3 sm:grid-cols-3">
               <Ozet etiket="Okunan satır" deger={rapor.toplamSatir} />
               <Ozet etiket="Geçerli" deger={gecerliSayisi} olumlu />
-              <Ozet etiket="Hatalı satır" deger={hataliSatirlar.size} olumsuz={hataliSatirlar.size > 0} />
+              <Ozet
+                etiket="Hatalı satır"
+                deger={hataliSatirlar.size}
+                olumsuz={hataliSatirlar.size > 0}
+              />
             </div>
 
             {rapor.hatalar && rapor.hatalar.length > 0 && (
@@ -193,7 +200,10 @@ export function IceAktarmaFormu({ sutunlar }: { sutunlar: SutunTanimi[] }) {
                     </thead>
                     <tbody>
                       {rapor.hatalar.map((hata, index) => (
-                        <tr key={`${hata.satirNo}-${hata.sutun}-${index}`} className="border-t border-border">
+                        <tr
+                          key={`${hata.satirNo}-${hata.sutun}-${index}`}
+                          className="border-t border-border"
+                        >
                           <td className="sayisal px-3 py-2 text-text-muted">{hata.satirNo}</td>
                           <td className="px-3 py-2 font-mono text-xs text-text">{hata.sutun}</td>
                           <td className="px-3 py-2 text-text-muted">
@@ -215,7 +225,12 @@ export function IceAktarmaFormu({ sutunlar }: { sutunlar: SutunTanimi[] }) {
             {cakisanSayisi > 0 && (
               <div className="flex flex-col gap-2 rounded-md bg-warning-bg px-3 py-2">
                 <div className="flex items-center gap-2">
-                  <AlertTriangle size={16} strokeWidth={1.75} className="text-warning" aria-hidden />
+                  <AlertTriangle
+                    size={16}
+                    strokeWidth={1.75}
+                    className="text-warning"
+                    aria-hidden
+                  />
                   <p className="text-sm font-medium text-warning">
                     {cakisanSayisi} satır zaten kayıtlı görünüyor
                   </p>
@@ -258,8 +273,8 @@ export function IceAktarmaFormu({ sutunlar }: { sutunlar: SutunTanimi[] }) {
                   value={JSON.stringify(rapor.hatalar ?? [])}
                 />
                 <p className="text-sm text-text-muted">
-                  Aktarılan ilanlar <strong>taslak</strong> olarak kaydedilir; siz yayınlayana
-                  kadar sitede görünmez.
+                  Aktarılan ilanlar <strong>taslak</strong> olarak kaydedilir; siz yayınlayana kadar
+                  sitede görünmez.
                 </p>
                 {sonuc.hata && (
                   <p role="alert" className="text-sm text-danger">

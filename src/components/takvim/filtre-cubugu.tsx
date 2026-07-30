@@ -47,9 +47,7 @@ export function FiltreCubugu({
 
   function coklukDegistir(alan: keyof AktifFiltre, deger: string) {
     const mevcut = filtre[alan];
-    const yeni = mevcut.includes(deger)
-      ? mevcut.filter((d) => d !== deger)
-      : [...mevcut, deger];
+    const yeni = mevcut.includes(deger) ? mevcut.filter((d) => d !== deger) : [...mevcut, deger];
     onFiltreDegis({ ...filtre, [alan]: yeni });
   }
 

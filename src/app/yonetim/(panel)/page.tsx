@@ -102,9 +102,7 @@ export default async function GostergePaneli() {
                   </span>
                   <Badge varyant="notr">{kayit.eylem}</Badge>
                   <span className="text-text">{kayit.varlik}</span>
-                  <span className="ml-auto text-text-muted">
-                    {kayit.admin?.takmaAd ?? "—"}
-                  </span>
+                  <span className="ml-auto text-text-muted">{kayit.admin?.takmaAd ?? "—"}</span>
                 </li>
               ))}
             </ul>

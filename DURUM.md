@@ -20,7 +20,7 @@ Yapım sırası şartname §8'deki tabloyu izler.
   şart koştuğu için var: `UNIQUE(abonelikId, ilanId, ofset)`.
 - Migration elle tamamlandı (Prisma bunları üretemiyor):
   - Türkçe ICU collation — `etiketler/kurumlar/ilanlar/kurum_tipleri/
-    koleksiyonlar/takvim_notlari` üzerindeki `ad`/`baslik`
+koleksiyonlar/takvim_notlari` üzerindeki `ad`/`baslik`
   - `ilanlar_bitis_sinavdan_sonra` (bitiş > sınav tarihi)
   - `abonelikler_hedef_xor` (`num_nonnulls(ilan, kurum, koleksiyon) = 1`)
   - `yorumlar_puan_araligi` (1–5)
@@ -152,9 +152,26 @@ mümkün olmadığı için eklendi (`Gonderim` ile aynı gerekçe).
 
 ### Adım 8 — Üyelik + bildirim
 
-- Kayıt/giriş, e-posta doğrulama, 13 yaş beyanı (§7 KVKK).
-- Takma ad **havuzdan atanır**, serbest metin değil (§4.9).
-- Dört seviyeli abonelik: tek ilan · yayınevi · koleksiyon · kapalı.
+**8a — bitti.** `lib/takma-ad.ts` (havuz üreteci), `lib/eposta.ts` (nodemailer;
+SMTP yapılandırılmamışsa konsola düşer, sessizce kaybolmaz), `lib/imzali-baglanti.ts`
+(HMAC + `timingSafeEqual`, DB'de token tutmadan giriş gerektirmeyen bağlantılar).
+
+**8b — bitti.** `/kayit`, `/giris`, `/eposta-dogrula`, `/hesabim`; üst barda
+takma ad / Giriş bağlantısı. Kararlar:
+
+- Doğrulama jetonu Auth.js'in mevcut `verification_tokens` tablosunda tutuluyor
+  (`expires` alanı zaten var), 48 saat, **tek kullanımlık**.
+- Kayıt ve "bağlantıyı tekrar gönder" e-posta kayıtlı olsun olmasın **aynı
+  mesajı** döndürüyor — hesap sayımı (enumeration) engelleniyor (§7).
+- Genel üye (`rol = KULLANICI`) e-postasını doğrulamadan **giriş yapamaz**;
+  panel rolleri bu kontrolün dışında (admin hesapları elle açılıyor).
+- Şifre değişince `oturumSurumu` artıyor → diğer cihazlardaki oturumlar bir
+  sonraki istekte kesiliyor. Tarayıcıda doğrulandı: açık ikinci sekme yenilenince
+  `/giris`e düştü.
+- `lib/rbac.ts`'e `requireUye()` / `uyeVarsa()` eklendi — panel `requireRol()`'ünün
+  genel site karşılığı, aynı DB doğrulamasını yapıyor.
+
+**Kalan:** Dört seviyeli abonelik: tek ilan · yayınevi · koleksiyon · kapalı.
 - pg-boss günlük planlayıcı (06:00), gönderim 08:00 ±15 dk.
 - **Idempotency zorunlu** — `Gonderim` tablosundaki unique kısıt korunmalı;
   §4.8 "sistemin en kırılgan yeri, testi yazılacak" diyor.

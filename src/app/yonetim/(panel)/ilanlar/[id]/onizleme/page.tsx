@@ -19,11 +19,7 @@ const UYGULAMA = { TURKIYE_GENELI: "Türkiye Geneli", KURUMSAL: "Kurumsal" } as 
 // §6 Önizleme: "yayınlamadan önce ilanın sitede nasıl göründüğü, seçili
 // versiyonda". Taslak ilanlar genel sitede görünmediği için (yayinDurumu
 // filtresi) bu ekran gerekli — admin yayınlamadan önce sonucu göremezdi.
-export default async function OnizlemeSayfasi({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function OnizlemeSayfasi({ params }: { params: Promise<{ id: string }> }) {
   await requireRol(["ADMIN", "EDITOR"]);
   const { id } = await params;
 
@@ -54,9 +50,7 @@ export default async function OnizlemeSayfasi({
           <Badge varyant={ilan.yayinDurumu === "YAYINDA" ? "basari" : "uyari"}>
             {ilan.yayinDurumu}
           </Badge>
-          <span className="text-sm text-text-muted">
-            Görünüm: {VERSIYON_ADLARI[versiyon]}
-          </span>
+          <span className="text-sm text-text-muted">Görünüm: {VERSIYON_ADLARI[versiyon]}</span>
           <Button varyant="ikincil" boyut="sm">
             <Link href={`/yonetim/ilanlar/${ilan.id}`}>Düzenle</Link>
           </Button>
@@ -130,9 +124,7 @@ export default async function OnizlemeSayfasi({
               <p className="sayisal text-xl font-semibold text-text uppercase">
                 {formatTarihAralik(ilan.sinavTarihi, ilan.sinavBitisTarihi)}
               </p>
-              <p className="sayisal text-sm text-text-muted">
-                {kalanGun(ilan.sinavTarihi, simdi)}
-              </p>
+              <p className="sayisal text-sm text-text-muted">{kalanGun(ilan.sinavTarihi, simdi)}</p>
             </div>
 
             {ilan.oturumlar.length > 0 && (
@@ -159,14 +151,9 @@ export default async function OnizlemeSayfasi({
                 <Satir etiket="Son sipariş" deger={formatTarih(ilan.sonSiparisTarihi)} />
               )}
               {ilan.cevapAnahtariZamani && (
-                <Satir
-                  etiket="Cevap anahtarı"
-                  deger={formatTarihSaat(ilan.cevapAnahtariZamani)}
-                />
+                <Satir etiket="Cevap anahtarı" deger={formatTarihSaat(ilan.cevapAnahtariZamani)} />
               )}
-              {ilan.dagiticiKurum && (
-                <Satir etiket="Dağıtım" deger={ilan.dagiticiKurum.ad} />
-              )}
+              {ilan.dagiticiKurum && <Satir etiket="Dağıtım" deger={ilan.dagiticiKurum.ad} />}
               <Satir etiket="Sezon" deger={ilan.sezon} />
             </dl>
           </CardGovde>

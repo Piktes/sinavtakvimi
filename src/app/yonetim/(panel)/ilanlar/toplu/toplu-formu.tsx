@@ -66,8 +66,8 @@ export function TopluFormu({ secenekler }: { secenekler: SecenekListeleri }) {
         <CardGovde className="flex flex-col gap-3 p-4">
           <h2 className="font-baslik text-lg font-semibold text-text">Ortak alanlar</h2>
           <p className="text-sm text-text-muted">
-            Bir kez girilir, tüm satırlara uygulanır. Başlık ön ekine sıra numarası eklenir
-            (ör. &quot;Özdebir TYT-AYT Denemesi 01&quot;).
+            Bir kez girilir, tüm satırlara uygulanır. Başlık ön ekine sıra numarası eklenir (ör.
+            &quot;Özdebir TYT-AYT Denemesi 01&quot;).
           </p>
 
           <div className="flex flex-col gap-1.5">

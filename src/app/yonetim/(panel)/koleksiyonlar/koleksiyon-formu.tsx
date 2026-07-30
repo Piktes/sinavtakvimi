@@ -73,9 +73,7 @@ export function KoleksiyonFormu({
   function coklu(alan: keyof KoleksiyonFiltresi, deger: string) {
     setFiltre((onceki) => {
       const mevcut = (onceki[alan] as string[]) ?? [];
-      const yeni = mevcut.includes(deger)
-        ? mevcut.filter((d) => d !== deger)
-        : [...mevcut, deger];
+      const yeni = mevcut.includes(deger) ? mevcut.filter((d) => d !== deger) : [...mevcut, deger];
       return { ...onceki, [alan]: yeni };
     });
   }
@@ -276,9 +274,7 @@ export function KoleksiyonFormu({
             </div>
           )}
 
-          <p className="text-xs text-text-muted">
-            Yalnızca yayında olan ilanlar sayılır.
-          </p>
+          <p className="text-xs text-text-muted">Yalnızca yayında olan ilanlar sayılır.</p>
         </CardGovde>
       </Card>
     </form>

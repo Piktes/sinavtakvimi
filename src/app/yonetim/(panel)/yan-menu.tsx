@@ -34,7 +34,9 @@ export function YanMenu({ ogeler }: { ogeler: NavOgesi[] }) {
             aria-current={aktif ? "page" : undefined}
             className={cn(
               "rounded-sm px-3 py-2 text-sm transition-colors",
-              aktif ? "bg-bg-subtle font-medium text-text" : "text-text-muted hover:bg-surface-hover",
+              aktif
+                ? "bg-bg-subtle font-medium text-text"
+                : "text-text-muted hover:bg-surface-hover",
             )}
           >
             {oge.etiket}

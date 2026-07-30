@@ -6,12 +6,12 @@ yorumladığı bir platform.
 
 ## Belgeler
 
-| Dosya | İçerik |
-|---|---|
-| [`docs/SINAV-ILAN-PLATFORMU.md`](docs/SINAV-ILAN-PLATFORMU.md) | Ürün şartnamesi |
-| [`KURULUM.md`](KURULUM.md) | Yeni makinede kurulum |
-| [`DURUM.md`](DURUM.md) | Yapılanlar, yol haritası, bilinen tuzaklar |
-| [`CLAUDE.md`](CLAUDE.md) | Geliştirme kuralları ve mimari özeti |
+| Dosya                                                          | İçerik                                     |
+| -------------------------------------------------------------- | ------------------------------------------ |
+| [`docs/SINAV-ILAN-PLATFORMU.md`](docs/SINAV-ILAN-PLATFORMU.md) | Ürün şartnamesi                            |
+| [`KURULUM.md`](KURULUM.md)                                     | Yeni makinede kurulum                      |
+| [`DURUM.md`](DURUM.md)                                         | Yapılanlar, yol haritası, bilinen tuzaklar |
+| [`CLAUDE.md`](CLAUDE.md)                                       | Geliştirme kuralları ve mimari özeti       |
 
 ## Hızlı başlangıç
 

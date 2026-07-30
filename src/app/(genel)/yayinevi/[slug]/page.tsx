@@ -25,11 +25,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function YayineviSayfasi({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function YayineviSayfasi({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
   const kurum = await prisma.kurum.findUnique({

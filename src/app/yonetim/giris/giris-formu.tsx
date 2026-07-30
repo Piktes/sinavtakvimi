@@ -21,13 +21,7 @@ export function GirisFormu({ devam }: { devam: string }) {
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="sifre">Şifre</Label>
-        <Input
-          id="sifre"
-          name="sifre"
-          type="password"
-          autoComplete="current-password"
-          required
-        />
+        <Input id="sifre" name="sifre" type="password" autoComplete="current-password" required />
       </div>
 
       {durum.hata && (

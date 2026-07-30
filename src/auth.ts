@@ -37,6 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             sifreHash: true,
             rol: true,
             durum: true,
+            epostaDogrulandi: true,
             oturumSurumu: true,
           },
         });
@@ -56,6 +57,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!kullanici || !dogruMu) return null;
         if (kullanici.durum !== "AKTIF") return null;
+
+        // Genel üye e-postasını doğrulamadan giremez (§4.9). Panel hesapları
+        // (ADMIN/EDITOR/MODERATOR) admin tarafından açıldığı için bu kontrolün
+        // dışında — aksi hâlde ilk yönetici hiç giriş yapamazdı.
+        if (kullanici.rol === "KULLANICI" && !kullanici.epostaDogrulandi) return null;
 
         await prisma.kullanici.update({
           where: { id: kullanici.id },

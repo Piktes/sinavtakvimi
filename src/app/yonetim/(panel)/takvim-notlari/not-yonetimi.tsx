@@ -47,9 +47,7 @@ export function NotYonetimi({ notlar }: { notlar: NotSatiri[] }) {
                 <p className="sayisal text-xs text-text-muted">{not.gosterim}</p>
               </div>
 
-              <Badge varyant="notr">
-                {TIPLER.find((t) => t.deger === not.tip)?.ad ?? not.tip}
-              </Badge>
+              <Badge varyant="notr">{TIPLER.find((t) => t.deger === not.tip)?.ad ?? not.tip}</Badge>
               {!not.aktifMi && <Badge varyant="notr">Pasif</Badge>}
 
               <Button varyant="hayalet" boyut="sm" onClick={() => setDuzenlenen(not)}>

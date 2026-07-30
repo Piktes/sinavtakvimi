@@ -115,9 +115,7 @@ export async function ilanKaydet(
     sinavBitisTarihi: veri.sinavBitisTarihi ? gun(veri.sinavBitisTarihi) : null,
     saat: veri.saat ?? null,
     sonSiparisTarihi: veri.sonSiparisTarihi ? gun(veri.sonSiparisTarihi) : null,
-    cevapAnahtariZamani: veri.cevapAnahtariZamani
-      ? istanbulZamani(veri.cevapAnahtariZamani)
-      : null,
+    cevapAnahtariZamani: veri.cevapAnahtariZamani ? istanbulZamani(veri.cevapAnahtariZamani) : null,
     uygulamaTipi: veri.uygulamaTipi,
     zorluk: veri.zorluk ?? null,
     aciklamaMd: veri.aciklamaMd ?? null,

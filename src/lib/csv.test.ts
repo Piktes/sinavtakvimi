@@ -62,9 +62,7 @@ describe("ayraciTahminEt", () => {
 
 describe("csvYaz", () => {
   it("ayraç içeren alanı tırnaklar", () => {
-    expect(csvYaz(["ad", "not"], [["Özdebir", "TYT; AYT"]])).toBe(
-      'ad;not\r\nÖzdebir;"TYT; AYT"',
-    );
+    expect(csvYaz(["ad", "not"], [["Özdebir", "TYT; AYT"]])).toBe('ad;not\r\nÖzdebir;"TYT; AYT"');
   });
 
   it("içteki tırnağı ikiler", () => {

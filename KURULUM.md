@@ -5,11 +5,11 @@ Depoyu klonladıktan sonra bu dosyayı baştan sona uygula. Şartname
 
 ## Gereksinimler
 
-| Araç | Sürüm | Not |
-|---|---|---|
-| Node.js | 20+ | 24.13 ile geliştirildi |
-| pnpm | 9.15.9 | `npm i -g pnpm` (Corepack'e güvenme, sürüm çakışabiliyor) |
-| PostgreSQL | 16 | ICU collation desteği gerekli (§2 Türkçe sıralama) |
+| Araç       | Sürüm  | Not                                                       |
+| ---------- | ------ | --------------------------------------------------------- |
+| Node.js    | 20+    | 24.13 ile geliştirildi                                    |
+| pnpm       | 9.15.9 | `npm i -g pnpm` (Corepack'e güvenme, sürüm çakışabiliyor) |
+| PostgreSQL | 16     | ICU collation desteği gerekli (§2 Türkçe sıralama)        |
 
 ## 1. Bağımlılıklar
 
@@ -39,14 +39,14 @@ Windows'ta `psql` PATH'te değilse tam yol:
 cp .env.example .env
 ```
 
-| Değişken | Zorunlu | Açıklama |
-|---|---|---|
-| `DATABASE_URL` | evet | `postgresql://postgres:postgres@localhost:5432/sinavilan?schema=public` |
-| `AUTH_SECRET` | evet | `openssl rand -base64 32` |
-| `AUTH_URL` | evet | Geliştirmede `http://localhost:3000` |
-| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | evet | İlk admin hesabı; seed bunu okur, kodda sabit şifre yoktur |
-| `IP_HASH_SALT` | evet | Ham IP saklanmaz, tuzlanmış hash (§7 KVKK) |
-| `SMTP_*` | hayır | Boşsa e-posta "yapılandırılmamış" olarak loglanır (§8 Adım 8'de gerekli) |
+| Değişken                                   | Zorunlu | Açıklama                                                                 |
+| ------------------------------------------ | ------- | ------------------------------------------------------------------------ |
+| `DATABASE_URL`                             | evet    | `postgresql://postgres:postgres@localhost:5432/sinavilan?schema=public`  |
+| `AUTH_SECRET`                              | evet    | `openssl rand -base64 32`                                                |
+| `AUTH_URL`                                 | evet    | Geliştirmede `http://localhost:3000`                                     |
+| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` | evet    | İlk admin hesabı; seed bunu okur, kodda sabit şifre yoktur               |
+| `IP_HASH_SALT`                             | evet    | Ham IP saklanmaz, tuzlanmış hash (§7 KVKK)                               |
+| `SMTP_*`                                   | hayır   | Boşsa e-posta "yapılandırılmamış" olarak loglanır (§8 Adım 8'de gerekli) |
 
 ## 4. Şema ve veri
 

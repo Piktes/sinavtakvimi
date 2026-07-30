@@ -73,11 +73,7 @@ export default async function KurumlarSayfasi() {
                 <Link href={`/yayinevi/${kurum.slug}`}>Sitede</Link>
               </Button>
 
-              <KurumSilButonu
-                id={kurum.id}
-                ad={kurum.ad}
-                ilanSayisi={kurum._count.ilanlar}
-              />
+              <KurumSilButonu id={kurum.id} ad={kurum.ad} ilanSayisi={kurum._count.ilanlar} />
             </li>
           ))}
         </ul>

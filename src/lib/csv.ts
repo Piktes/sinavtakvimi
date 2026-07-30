@@ -19,11 +19,7 @@ function alaniKacir(deger: string, ayrac: string): string {
   return deger;
 }
 
-export function csvYaz(
-  basliklar: string[],
-  satirlar: string[][],
-  ayrac = CSV_AYRAC,
-): string {
+export function csvYaz(basliklar: string[], satirlar: string[][], ayrac = CSV_AYRAC): string {
   const tumSatirlar = [basliklar, ...satirlar];
   return tumSatirlar
     .map((satir) => satir.map((hucre) => alaniKacir(hucre ?? "", ayrac)).join(ayrac))
@@ -104,7 +100,10 @@ export function csvOku(metin: string, ayrac?: string): string[][] {
 
 // Başlık satırını okuyup her veri satırını { başlık: değer } nesnesine çevirir.
 // Başlıklar kırpılır; eksik hücreler boş string olur.
-export function csvNesneleriOku(metin: string): { basliklar: string[]; satirlar: Record<string, string>[] } {
+export function csvNesneleriOku(metin: string): {
+  basliklar: string[];
+  satirlar: Record<string, string>[];
+} {
   const hamSatirlar = csvOku(metin);
   if (hamSatirlar.length === 0) return { basliklar: [], satirlar: [] };
 

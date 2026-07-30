@@ -113,26 +113,26 @@ describe("satiriCoz", () => {
   });
 
   it("bitiş tarihi sınavdan önceyse reddeder", () => {
-    const { hatalar } = satiriCoz(
-      { ...gecerliSatir, sinavBitisTarihi: "29.10.2026" },
-      4,
-      tablolar,
-    );
+    const { hatalar } = satiriCoz({ ...gecerliSatir, sinavBitisTarihi: "29.10.2026" }, 4, tablolar);
     expect(hatalar[0].sutun).toBe("sinavBitisTarihi");
   });
 
   it("son sipariş sınavdan sonraysa reddeder", () => {
-    const { hatalar } = satiriCoz(
-      { ...gecerliSatir, sonSiparisTarihi: "31.10.2026" },
-      4,
-      tablolar,
-    );
+    const { hatalar } = satiriCoz({ ...gecerliSatir, sonSiparisTarihi: "31.10.2026" }, 4, tablolar);
     expect(hatalar[0].sutun).toBe("sonSiparisTarihi");
   });
 
   it("bir satırdaki tüm hataları birden toplar", () => {
     const { hatalar, veri } = satiriCoz(
-      { baslik: "", kurum: "Yok", grup: "", format: "", duzeyler: "", sinavTarihi: "abc", uygulamaTipi: "" },
+      {
+        baslik: "",
+        kurum: "Yok",
+        grup: "",
+        format: "",
+        duzeyler: "",
+        sinavTarihi: "abc",
+        uygulamaTipi: "",
+      },
       7,
       tablolar,
     );

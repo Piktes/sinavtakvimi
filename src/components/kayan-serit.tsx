@@ -26,7 +26,10 @@ export function KayanSerit({ ilanlar, simdi }: { ilanlar: IlanOzet[]; simdi: Dat
             className="serit-parca flex shrink-0 items-center gap-6 px-3"
           >
             {ilanlar.map((ilan) => (
-              <li key={`${anahtar}-${ilan.id}`} className="flex items-center gap-2 whitespace-nowrap">
+              <li
+                key={`${anahtar}-${ilan.id}`}
+                className="flex items-center gap-2 whitespace-nowrap"
+              >
                 <span
                   aria-hidden
                   style={kurumRengi(ilan.kurum.slug)}
