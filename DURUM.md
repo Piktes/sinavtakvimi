@@ -171,7 +171,25 @@ takma ad / Giriş bağlantısı. Kararlar:
 - `lib/rbac.ts`'e `requireUye()` / `uyeVarsa()` eklendi — panel `requireRol()`'ünün
   genel site karşılığı, aynı DB doğrulamasını yapıyor.
 
+**8c — bitti.** `lib/ics.ts` (bağımlılıksız RFC 5545 üreteci, 18 test) +
+`lib/veri/ics.ts` + `/api/ics/{ilan,yayinevi,koleksiyon}/[slug].ics`.
+İlan detayında "Takvime ekle" menüsü (Google Takvim şablonu · .ics indir ·
+yayınevi akışına abone ol); yayınevi ve koleksiyon sayfalarında "Takvime
+abone ol". Dikkat edilenler:
+
+- **DTEND tüm-gün olaylarda dışlayıcıdır** — 12 Nisan'da biten sınav için
+  13 Nisan yazılır, yoksa takvimde son gün eksik görünür.
+- Satır katlama **bayt** sayar, karakter değil: "ğ" UTF-8'de 2 bayt, karakter
+  sayılırsa 75 oktetlik sınır aşılır ve bazı istemciler dosyayı reddeder.
+- UID `ilan-<id>@sinavilan` — kalıcı; tarih değişince istemci aynı olayı
+  günceller, ikinci kayıt oluşturmaz.
+- Koleksiyon akışı ile koleksiyon sayfası **aynı `filtreyiWhereCevir`**
+  fonksiyonundan geçer; ayrı bir çeviri yazılsaydı akış sessizce farklı bir
+  küme döndürebilirdi.
+- Google Takvim tarafında **OAuth yok** (§4.7) — yalnızca şablon bağlantısı.
+
 **Kalan:** Dört seviyeli abonelik: tek ilan · yayınevi · koleksiyon · kapalı.
+
 - pg-boss günlük planlayıcı (06:00), gönderim 08:00 ±15 dk.
 - **Idempotency zorunlu** — `Gonderim` tablosundaki unique kısıt korunmalı;
   §4.8 "sistemin en kırılgan yeri, testi yazılacak" diyor.

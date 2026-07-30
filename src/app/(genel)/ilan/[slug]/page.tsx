@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CalendarPlus, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { IlanKarti } from "@/components/ilan-karti";
+import { TakvimeEkle } from "@/components/takvime-ekle";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardGovde } from "@/components/ui/card";
+import { siteAdresi } from "@/lib/eposta";
+import { googleTakvimBaglantisi } from "@/lib/ics";
 import { kurumRengi } from "@/lib/kurum-tonu";
 import { formatTarih, formatTarihAralik, formatTarihSaat, kalanGun } from "@/lib/tarih";
 import { ayniHaftadakiIlanlar, ilanDetayi, seriDigerIlanlari } from "@/lib/veri/ilan";
@@ -152,12 +154,20 @@ export default async function IlanDetay({ params }: { params: Promise<{ slug: st
       </section>
 
       <div className="flex flex-wrap gap-2">
-        {/* §4.7: Takvime ekle — Google Takvim şablon bağlantısı + .ics.
-         * Üyelik/bildirim katmanıyla birlikte §8 Adım 8'de etkinleşecek. */}
-        <Button varyant="birincil" boyut="md" disabled title="Yakında">
-          <CalendarPlus size={16} strokeWidth={1.75} aria-hidden />
-          Takvime ekle
-        </Button>
+        {/* §4.7: Google Takvim şablon bağlantısı + .ics + yayınevinin
+         * abone olunabilir akışı. OAuth yok. */}
+        <TakvimeEkle
+          googleUrl={googleTakvimBaglantisi({
+            baslik: ilan.baslik,
+            baslangic: ilan.sinavTarihi,
+            bitis: ilan.sinavBitisTarihi,
+            aciklama: `${ilan.kurum.ad} · ${UYGULAMA_ETIKETI[ilan.uygulamaTipi]}`,
+            url: `${siteAdresi()}/ilan/${ilan.slug}`,
+          })}
+          icsUrl={`/api/ics/ilan/${ilan.slug}.ics`}
+          akisUrl={`/api/ics/yayinevi/${ilan.kurum.slug}.ics`}
+          akisEtiketi={`${ilan.kurum.ad} takvimine abone ol`}
+        />
         {ilan.detayUrl && (
           <a
             href={ilan.detayUrl}

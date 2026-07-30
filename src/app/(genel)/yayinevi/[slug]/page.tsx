@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CalendarX } from "lucide-react";
 import { IlanKarti } from "@/components/ilan-karti";
+import { TakvimAkisiDugmesi } from "@/components/takvim-akisi-dugmesi";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { kurumRengi } from "@/lib/kurum-tonu";
@@ -51,7 +52,7 @@ export default async function YayineviSayfasi({ params }: { params: Promise<{ sl
 
   return (
     <div className="flex flex-col gap-5">
-      <header className="flex items-center gap-3">
+      <header className="flex flex-wrap items-center gap-3">
         <span
           aria-hidden
           style={kurumRengi(kurum.slug)}
@@ -63,6 +64,11 @@ export default async function YayineviSayfasi({ params }: { params: Promise<{ sl
             <Badge varyant="cizgi">{kurum.tip.ad}</Badge>
             <span className="sayisal text-sm text-text-muted">{ilanlar.length} ilan</span>
           </div>
+        </div>
+
+        {/* §4.7 abone olunabilir akış. */}
+        <div className="ml-auto">
+          <TakvimAkisiDugmesi akisUrl={`/api/ics/yayinevi/${kurum.slug}.ics`} ad={kurum.ad} />
         </div>
       </header>
 

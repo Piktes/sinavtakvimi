@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { TakvimSayfasi } from "@/app/(genel)/takvim/takvim-sayfasi";
+import { TakvimAkisiDugmesi } from "@/components/takvim-akisi-dugmesi";
 import { filtreyiWhereCevir, koleksiyonBul } from "@/lib/veri/ilan";
 
 // §4.6: /k/[slug] — üst menü sekmesinin açtığı koleksiyon takvimi.
@@ -40,6 +41,11 @@ export default async function KoleksiyonSayfasi({
       aramaParametreleri={parametreler}
       ekFiltre={filtreyiWhereCevir(koleksiyon.filtre)}
       baslik={koleksiyon.ad}
+      // §4.7: koleksiyonun abone olunabilir akışı — akış, sayfadakiyle
+      // aynı filtre çevirisini kullanır (lib/veri/ics.ts).
+      baslikEylemi={
+        <TakvimAkisiDugmesi akisUrl={`/api/ics/koleksiyon/${slug}.ics`} ad={koleksiyon.ad} />
+      }
     />
   );
 }

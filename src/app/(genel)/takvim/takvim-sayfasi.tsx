@@ -13,12 +13,15 @@ export async function TakvimSayfasi({
   aramaParametreleri,
   ekFiltre,
   baslik,
+  baslikEylemi,
 }: {
   yil: number;
   ay: number;
   aramaParametreleri: Record<string, string | string[] | undefined>;
   ekFiltre?: Prisma.IlanWhereInput;
   baslik?: string;
+  /** Başlık satırının sağına yerleşen eylem (ör. takvim akışı düğmesi). */
+  baslikEylemi?: React.ReactNode;
 }) {
   const params = new URLSearchParams();
   for (const [anahtar, deger] of Object.entries(aramaParametreleri)) {
@@ -62,7 +65,12 @@ export async function TakvimSayfasi({
 
   return (
     <div className="flex flex-col gap-4">
-      {baslik && <h2 className="font-baslik text-2xl font-semibold text-text">{baslik}</h2>}
+      {(baslik || baslikEylemi) && (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          {baslik && <h2 className="font-baslik text-2xl font-semibold text-text">{baslik}</h2>}
+          {baslikEylemi}
+        </div>
+      )}
       <TakvimKabugu
         yil={yil}
         ay={ay}
