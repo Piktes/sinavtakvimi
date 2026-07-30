@@ -87,6 +87,38 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* §3.6: yayınevi rengi. Ton `--kurum-h` ile beslenir (slug'dan deterministik),
+ * doygunluk ve açıklık token'dan gelir ve SABİTTİR. Bileşenler yalnızca bu
+ * sınıfı kullanır — serbest Tailwind değeri yazmalarına gerek kalmaz (§3.1). */
+.kurum-zemin {
+  background: hsl(var(--kurum-h) var(--kurum-doygunluk) var(--kurum-aciklik));
+}
+
+.kurum-metin {
+  color: hsl(var(--kurum-h) var(--kurum-doygunluk) var(--kurum-aciklik));
+}
+
+/* §4.5 kayan şerit: CSS transform ile, `marquee` etiketi veya setInterval yok.
+ * Üzerine gelince durur. prefers-reduced-motion altındaki global kural
+ * animasyonu zaten durduruyor. */
+@keyframes serit-kaydir {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.serit-parca {
+  animation: serit-kaydir 40s linear infinite;
+}
+
+.serit-kapsayici:hover .serit-parca,
+.serit-kapsayici:focus-within .serit-parca {
+  animation-play-state: paused;
+}
+
 /* §3.7: odak halkası her etkileşimli öğede aynı. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid var(--focus-ring);
