@@ -13,6 +13,7 @@ import {
   type AktarmaSonucu,
   type DogrulamaRaporu,
 } from "./actions";
+import { GeriAlButonu } from "./geri-al-butonu";
 import type { SutunTanimi } from "@/lib/ice-aktarma/ilan-sutunlari";
 
 const bosRapor: DogrulamaRaporu = {};
@@ -22,6 +23,7 @@ export function IceAktarmaFormu({ sutunlar }: { sutunlar: SutunTanimi[] }) {
   const [rapor, dogrulaEylemi, dogrulaBekliyor] = useActionState(dosyayiDogrula, bosRapor);
   const [sonuc, aktarEylemi, aktarBekliyor] = useActionState(onaylananlariAktar, bosSonuc);
   const [cakisanlariAtla, setCakisanlariAtla] = useState(true);
+  const [dosyaAdi, setDosyaAdi] = useState("");
 
   const gecerliSayisi = rapor.gecerli?.length ?? 0;
   const hataliSatirlar = new Set(rapor.hatalar?.map((h) => h.satirNo));
@@ -40,14 +42,22 @@ export function IceAktarmaFormu({ sutunlar }: { sutunlar: SutunTanimi[] }) {
           <p className="text-sm text-text-muted">
             İlanlar listesinden gözden geçirip yayınlayabilirsiniz.
           </p>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button varyant="birincil" boyut="sm">
               <Link href="/yonetim/ilanlar?yayin=TASLAK">Taslakları gör</Link>
             </Button>
             <Button varyant="ikincil" boyut="sm">
               <Link href="/yonetim/ilanlar/ice-aktar">Yeni dosya yükle</Link>
             </Button>
+            {/* §4.2: yanlış dosya yüklendiği hemen fark edilirse tek tıkla dönülebilsin. */}
+            {sonuc.partiId && <GeriAlButonu partiId={sonuc.partiId} etiket="Bu yüklemeyi geri al" />}
           </div>
+          <p className="text-xs text-text-muted">
+            Geri alma, bu yüklemeden gelen ve hâlâ taslak olan ilanları siler.{" "}
+            <Link href="/yonetim/ilanlar/ice-aktar/gecmis" className="underline">
+              Yükleme geçmişi
+            </Link>
+          </p>
         </CardGovde>
       </Card>
     );
@@ -121,7 +131,14 @@ export function IceAktarmaFormu({ sutunlar }: { sutunlar: SutunTanimi[] }) {
           <form action={dogrulaEylemi} className="flex flex-wrap items-end gap-3">
             <div className="flex min-w-64 flex-1 flex-col gap-1.5">
               <Label htmlFor="dosya">CSV dosyası</Label>
-              <Input id="dosya" name="dosya" type="file" accept=".csv,text/csv" required />
+              <Input
+                id="dosya"
+                name="dosya"
+                type="file"
+                accept=".csv,text/csv"
+                required
+                onChange={(olay) => setDosyaAdi(olay.target.files?.[0]?.name ?? "")}
+              />
             </div>
             <Button type="submit" disabled={dogrulaBekliyor}>
               {dogrulaBekliyor ? "Kontrol ediliyor…" : "Kontrol et"}
@@ -229,6 +246,16 @@ export function IceAktarmaFormu({ sutunlar }: { sutunlar: SutunTanimi[] }) {
                   type="hidden"
                   name="cakisanlariAtla"
                   value={cakisanlariAtla ? "true" : "false"}
+                />
+                {/* Parti kaydı için: dosya adı ve rapor özeti saklanır, sonradan
+                    "neydi bu yükleme" sorusuna dönüp bakılabilsin (§4.2). */}
+                <input type="hidden" name="dosyaAdi" value={dosyaAdi} />
+                <input type="hidden" name="toplamSatir" value={rapor.toplamSatir ?? 0} />
+                <input type="hidden" name="hataliSatir" value={hataliSatirlar.size} />
+                <input
+                  type="hidden"
+                  name="hataRaporuJson"
+                  value={JSON.stringify(rapor.hatalar ?? [])}
                 />
                 <p className="text-sm text-text-muted">
                   Aktarılan ilanlar <strong>taslak</strong> olarak kaydedilir; siz yayınlayana

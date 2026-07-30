@@ -132,6 +132,7 @@ export async function dosyayiDogrula(
 export interface AktarmaSonucu {
   hata?: string;
   eklenen?: number;
+  partiId?: string;
 }
 
 // §4.2 ikinci adım: yalnızca GEÇERLİ satırlar, TASLAK olarak eklenir.
@@ -155,6 +156,26 @@ export async function onaylananlariAktar(
   const gun = (deger: string) => new Date(`${deger}T00:00:00.000Z`);
   // Girilen saat Europe/Istanbul kabul edilir; DB'ye UTC yazılır.
   const zaman = (deger: string) => new Date(`${deger}:00.000+03:00`);
+
+  // §4.2: parti kaydı — hangi ilanın hangi yüklemeden geldiği izlenmeden
+  // toplu geri alma yapılamaz.
+  let hataRaporu: unknown = null;
+  try {
+    hataRaporu = JSON.parse((formData.get("hataRaporuJson") as string) || "null");
+  } catch {
+    hataRaporu = null;
+  }
+
+  const parti = await prisma.iceAktarmaPartisi.create({
+    data: {
+      dosyaAdi: (formData.get("dosyaAdi") as string) || "bilinmeyen.csv",
+      adminId: oturum.kullaniciId,
+      satirSayisi: Number(formData.get("toplamSatir")) || satirlar.length,
+      basarili: 0,
+      hatali: Number(formData.get("hataliSatir")) || 0,
+      hataRaporu: (hataRaporu as object) ?? undefined,
+    },
+  });
 
   let eklenen = 0;
 
@@ -194,6 +215,7 @@ export async function onaylananlariAktar(
         sezon: satir.sezon,
         yayinDurumu: "TASLAK",
         olusturanId: oturum.kullaniciId,
+        iceAktarmaPartisiId: parti.id,
         duzeyler: { connect: satir.duzeyIds.map((id) => ({ id })) },
       },
     });
@@ -201,14 +223,76 @@ export async function onaylananlariAktar(
     eklenen += 1;
   }
 
+  await prisma.iceAktarmaPartisi.update({
+    where: { id: parti.id },
+    data: { basarili: eklenen },
+  });
+
   await denetimYaz({
     adminId: oturum.kullaniciId,
     eylem: "OLUSTUR",
-    varlik: "Ilan",
-    varlikId: `ice-aktarma-${Date.now()}`,
+    varlik: "IceAktarmaPartisi",
+    varlikId: parti.id,
     sonrasi: { kaynak: "CSV içe aktarma", eklenen },
   });
 
   revalidatePath("/yonetim/ilanlar");
-  return { eklenen };
+  revalidatePath("/yonetim/ilanlar/ice-aktar/gecmis");
+  return { eklenen, partiId: parti.id };
+}
+
+export interface GeriAlmaSonucu {
+  hata?: string;
+  silinen?: number;
+  korunan?: number;
+}
+
+// §4.2: "hatalı yükleme tek işlemle geri alınır."
+//
+// Güvenlik tercihi: yalnızca HÂLÂ TASLAK olan ilanlar silinir. Admin bir
+// ilanı yayınladıysa ya da arşivlediyse artık bilinçli bir karar vermiştir;
+// toplu geri alma onu sessizce silmemeli. Korunanlar sayıyla bildirilir.
+export async function partiyiGeriAl(partiId: string): Promise<GeriAlmaSonucu> {
+  const oturum = await requireRol(ROLLER);
+
+  const parti = await prisma.iceAktarmaPartisi.findUnique({
+    where: { id: partiId },
+    select: { id: true, durum: true, dosyaAdi: true },
+  });
+  if (!parti) return { hata: "Yükleme kaydı bulunamadı." };
+  if (parti.durum === "GERI_ALINDI") return { hata: "Bu yükleme zaten geri alınmış." };
+
+  const [taslaklar, korunan] = await Promise.all([
+    prisma.ilan.findMany({
+      where: { iceAktarmaPartisiId: partiId, yayinDurumu: "TASLAK" },
+      select: { id: true },
+    }),
+    prisma.ilan.count({
+      where: { iceAktarmaPartisiId: partiId, yayinDurumu: { not: "TASLAK" } },
+    }),
+  ]);
+
+  const silinenSonuc = await prisma.ilan.deleteMany({
+    where: { id: { in: taslaklar.map((i) => i.id) } },
+  });
+
+  await prisma.iceAktarmaPartisi.update({
+    where: { id: partiId },
+    data: { durum: "GERI_ALINDI", geriAlindi: new Date() },
+  });
+
+  await denetimYaz({
+    adminId: oturum.kullaniciId,
+    eylem: "SIL",
+    varlik: "IceAktarmaPartisi",
+    varlikId: partiId,
+    oncesi: { dosyaAdi: parti.dosyaAdi },
+    sonrasi: { silinen: silinenSonuc.count, korunan },
+  });
+
+  revalidatePath("/yonetim/ilanlar");
+  revalidatePath("/yonetim/ilanlar/ice-aktar/gecmis");
+  revalidatePath("/takvim");
+
+  return { silinen: silinenSonuc.count, korunan };
 }

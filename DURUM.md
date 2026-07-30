@@ -131,8 +131,20 @@ yapıldı.
 - `src/lib/csv.ts` bağımlılıksız (tırnaklı alan, gömülü ayraç/satır sonu,
   çift tırnak kaçışı) — 18 birim testiyle kapsanmış.
 
-**Eksik kalan:** §4.2'deki "parti kaydıyla toplu geri alma". Yeni spec'in 10
-tablo listesinde `ImportBatch` yok; eklenirse geri alma da yazılabilir.
+**Toplu geri alma** (§4.2 "hatalı yükleme tek işlemle geri alınır"):
+her yükleme `IceAktarmaPartisi` olarak kaydedilir, `Ilan.iceAktarmaPartisiId`
+ile ilanlar partiye bağlanır. `/yonetim/ilanlar/ice-aktar/gecmis` ekranından
+tek tıkla geri alınır.
+
+Güvenlik tercihi: geri alma yalnızca **hâlâ TASLAK** olan ilanları siler.
+Admin bir ilanı yayınladıysa/arşivlediyse bilinçli karar vermiştir; toplu
+işlem onu sessizce silmemeli. Sonuç mesajı ikisini ayrı bildirir
+("2 taslak silindi, 1 yayınlanmış ilan korundu"). Parti kaydı silinmez,
+GERI_ALINDI olarak işaretlenir — izlenebilirlik korunur.
+
+`IceAktarmaPartisi`, §2'nin 10 tablo hedefi dışında; §4.2 geri almayı açıkça
+şart koştuğu ve hangi ilanın hangi yüklemeden geldiği kaydedilmeden bu
+mümkün olmadığı için eklendi (`Gonderim` ile aynı gerekçe).
 
 ---
 

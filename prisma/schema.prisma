@@ -75,6 +75,11 @@ enum TemaTercihi {
   KOYU
 }
 
+enum IceAktarmaDurumu {
+  TAMAMLANDI
+  GERI_ALINDI
+}
+
 enum YorumDurumu {
   BEKLIYOR
   ONAYLANDI
@@ -183,25 +188,31 @@ model Ilan {
   puanOrtalama Float? @map("puan_ortalama")
   puanSayisi   Int    @default(0) @map("puan_sayisi")
 
+  // §4.2: "hatalı yükleme tek işlemle geri alınabilir." Hangi ilanın hangi
+  // yüklemeden geldiğini bilmeden toplu geri alma yapılamaz.
+  iceAktarmaPartisiId String? @map("ice_aktarma_partisi_id")
+
   olusturanId String?  @map("olusturan_id")
   olusturulma DateTime @default(now()) @db.Timestamptz(6)
   guncellenme DateTime @updatedAt @db.Timestamptz(6)
 
-  kurum         Kurum      @relation("IlanKurum", fields: [kurumId], references: [id])
-  dagiticiKurum Kurum?     @relation("IlanDagiticiKurum", fields: [dagiticiKurumId], references: [id], onDelete: SetNull)
-  grup          Etiket     @relation("IlanGrup", fields: [grupId], references: [id])
-  format        Etiket     @relation("IlanFormat", fields: [formatId], references: [id])
-  duzeyler      Etiket[]   @relation("IlanDuzeyleri")
-  olusturan     Kullanici? @relation("IlanOlusturan", fields: [olusturanId], references: [id], onDelete: SetNull)
-  oturumlar     Oturum[]
-  yorumlar      Yorum[]
-  abonelikler   Abonelik[]
+  kurum             Kurum              @relation("IlanKurum", fields: [kurumId], references: [id])
+  dagiticiKurum     Kurum?             @relation("IlanDagiticiKurum", fields: [dagiticiKurumId], references: [id], onDelete: SetNull)
+  grup              Etiket             @relation("IlanGrup", fields: [grupId], references: [id])
+  format            Etiket             @relation("IlanFormat", fields: [formatId], references: [id])
+  duzeyler          Etiket[]           @relation("IlanDuzeyleri")
+  olusturan         Kullanici?         @relation("IlanOlusturan", fields: [olusturanId], references: [id], onDelete: SetNull)
+  iceAktarmaPartisi IceAktarmaPartisi? @relation(fields: [iceAktarmaPartisiId], references: [id], onDelete: SetNull)
+  oturumlar         Oturum[]
+  yorumlar          Yorum[]
+  abonelikler       Abonelik[]
 
   @@index([yayinDurumu, sinavTarihi])
   @@index([sezon, sinavTarihi])
   @@index([kurumId])
   @@index([grupId])
   @@index([formatId])
+  @@index([iceAktarmaPartisiId])
   @@map("ilanlar")
 }
 
@@ -284,12 +295,13 @@ model Kullanici {
   olusturulma            DateTime        @default(now()) @db.Timestamptz(6)
   sonGiris               DateTime?       @map("son_giris") @db.Timestamptz(6)
 
-  duzey              Etiket?        @relation(fields: [duzeyId], references: [id], onDelete: SetNull)
+  duzey              Etiket?             @relation(fields: [duzeyId], references: [id], onDelete: SetNull)
   abonelikler        Abonelik[]
-  yorumlar           Yorum[]        @relation("YorumYazar")
-  moderasyonlari     Yorum[]        @relation("YorumModerator")
-  olusturduguIlanlar Ilan[]         @relation("IlanOlusturan")
+  yorumlar           Yorum[]             @relation("YorumYazar")
+  moderasyonlari     Yorum[]             @relation("YorumModerator")
+  olusturduguIlanlar Ilan[]              @relation("IlanOlusturan")
   denetimKayitlari   DenetimKaydi[]
+  iceAktarmalari     IceAktarmaPartisi[]
   hesaplar           Account[]
   oturumlar          Session[]
 
@@ -411,6 +423,31 @@ model Yorum {
 // ---------------------------------------------------------------------------
 // Sistem
 // ---------------------------------------------------------------------------
+
+// §4.2: "ImportBatch sayesinde hatalı yükleme tek işlemle geri alınır."
+// §2'nin 10 tablo hedefi dışında; §4.2 geri almayı açıkça şart koştuğu ve
+// hangi ilanın hangi yüklemeden geldiği kaydedilmeden bu mümkün olmadığı
+// için eklendi (Gonderim tablosuyla aynı gerekçe).
+model IceAktarmaPartisi {
+  id          String           @id @default(cuid())
+  dosyaAdi    String           @map("dosya_adi")
+  adminId     String?          @map("admin_id")
+  satirSayisi Int              @map("satir_sayisi")
+  basarili    Int
+  hatali      Int
+  durum       IceAktarmaDurumu @default(TAMAMLANDI)
+  // Doğrulama raporu saklanır: yükleme sonrası "neydi bu hatalar" sorusuna
+  // dönüp bakılabilsin.
+  hataRaporu  Json?            @map("hata_raporu")
+  zaman       DateTime         @default(now()) @db.Timestamptz(6)
+  geriAlindi  DateTime?        @map("geri_alindi") @db.Timestamptz(6)
+
+  admin   Kullanici? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  ilanlar Ilan[]
+
+  @@index([zaman])
+  @@map("ice_aktarma_partileri")
+}
 
 model Ayar {
   anahtar String  @id
