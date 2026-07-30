@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardGovde } from "@/components/ui/card";
 import { Input, Label, Textarea } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { ILLER } from "@/lib/iller";
 import { ilanKaydet, type IlanFormDurumu } from "./actions";
 
 const baslangic: IlanFormDurumu = {};
@@ -32,6 +33,7 @@ export interface IlanBaslangicVerisi {
   sonSiparisTarihi: string | null;
   cevapAnahtariZamani: string | null;
   uygulamaTipi: string;
+  il: string | null;
   zorluk: string | null;
   aciklamaMd: string | null;
   afisUrl: string | null;
@@ -70,6 +72,7 @@ export function IlanFormu({
   const [dagiticiKurumId, setDagiticiKurumId] = useState(ilan?.dagiticiKurumId ?? "");
   const [grupId, setGrupId] = useState(ilan?.grupId ?? "");
   const [formatId, setFormatId] = useState(ilan?.formatId ?? "");
+  const [uygulamaTipi, setUygulamaTipi] = useState(ilan?.uygulamaTipi ?? "TURKIYE_GENELI");
 
   // §2: Oturum bölümü varsayılan KAPALI — çoğu ilanda boş.
   const [oturumlarAcik, setOturumlarAcik] = useState((ilan?.oturumlar.length ?? 0) > 0);
@@ -338,12 +341,28 @@ export function IlanFormu({
             <Select
               id="uygulamaTipi"
               name="uygulamaTipi"
-              defaultValue={ilan?.uygulamaTipi ?? "TURKIYE_GENELI"}
+              value={uygulamaTipi}
+              onChange={(olay) => setUygulamaTipi(olay.target.value)}
             >
               <option value="TURKIYE_GENELI">Türkiye Geneli</option>
               <option value="KURUMSAL">Kurumsal</option>
             </Select>
           </Alan>
+
+          {/* Yalnızca Kurumsal'da anlamlı — Türkiye Geneli zaten tüm ülkeyi
+              kapsar, il seçimi gerektirmez (§2). */}
+          {uygulamaTipi === "KURUMSAL" && (
+            <Alan ad="il" etiket="İl" hata={durum.alanHatalari?.il}>
+              <Select id="il" name="il" defaultValue={ilan?.il ?? ""}>
+                <option value="">Belirtilmedi</option>
+                {ILLER.map((il) => (
+                  <option key={il} value={il}>
+                    {il}
+                  </option>
+                ))}
+              </Select>
+            </Alan>
+          )}
 
           <Alan ad="zorluk" etiket="Zorluk">
             <Select id="zorluk" name="zorluk" defaultValue={ilan?.zorluk ?? ""}>

@@ -76,6 +76,7 @@ export async function ilanKaydet(
     sonSiparisTarihi: formData.get("sonSiparisTarihi"),
     cevapAnahtariZamani: formData.get("cevapAnahtariZamani"),
     uygulamaTipi: formData.get("uygulamaTipi"),
+    il: formData.get("il"),
     zorluk: formData.get("zorluk"),
     aciklamaMd: formData.get("aciklamaMd"),
     afisUrl: formData.get("afisUrl"),
@@ -120,6 +121,9 @@ export async function ilanKaydet(
     sonSiparisTarihi: veri.sonSiparisTarihi ? gun(veri.sonSiparisTarihi) : null,
     cevapAnahtariZamani: veri.cevapAnahtariZamani ? istanbulZamani(veri.cevapAnahtariZamani) : null,
     uygulamaTipi: veri.uygulamaTipi,
+    // §2: il yalnızca Kurumsal'da anlamlı — Türkiye Geneli seçiliyken
+    // formdan sızmış olsa bile kaydedilmez.
+    il: veri.uygulamaTipi === "KURUMSAL" ? (veri.il ?? null) : null,
     zorluk: veri.zorluk ?? null,
     aciklamaMd: veri.aciklamaMd ?? null,
     afisUrl: veri.afisUrl ?? null,
@@ -276,6 +280,7 @@ export async function ilanYilKopyala(id: string): Promise<{ hata?: string }> {
       sonSiparisTarihi: birYilEkle(orijinal.sonSiparisTarihi),
       cevapAnahtariZamani: birYilEkle(orijinal.cevapAnahtariZamani),
       uygulamaTipi: orijinal.uygulamaTipi,
+      il: orijinal.il,
       zorluk: orijinal.zorluk,
       aciklamaMd: orijinal.aciklamaMd,
       afisUrl: orijinal.afisUrl,

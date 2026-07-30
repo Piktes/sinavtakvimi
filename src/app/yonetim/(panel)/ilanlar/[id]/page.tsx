@@ -64,6 +64,7 @@ export default async function IlanDuzenleSayfasi({ params }: { params: Promise<{
           sonSiparisTarihi: gunDegeri(ilan.sonSiparisTarihi),
           cevapAnahtariZamani: yerelZamanDegeri(ilan.cevapAnahtariZamani),
           uygulamaTipi: ilan.uygulamaTipi,
+          il: ilan.il,
           zorluk: ilan.zorluk,
           aciklamaMd: ilan.aciklamaMd,
           afisUrl: ilan.afisUrl,

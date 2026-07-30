@@ -20,6 +20,7 @@ function ilan(parcali: Partial<IlanOzet> & { id: string }): IlanOzet {
     sonSiparisTarihi: null,
     cevapAnahtariZamani: null,
     uygulamaTipi: "TURKIYE_GENELI",
+    il: null,
     zorluk: "ORTA",
     oneCikar: false,
     puanOrtalama: null,
@@ -84,6 +85,16 @@ describe("ilanlariFiltrele", () => {
       0,
     );
   });
+
+  it("ile göre süzer, ili boş olan ilan il filtresi varken elenir", () => {
+    const illi = [
+      ilan({ id: "d", uygulamaTipi: "KURUMSAL", il: "İstanbul" }),
+      ilan({ id: "e", uygulamaTipi: "KURUMSAL", il: null }),
+    ];
+    expect(
+      ilanlariFiltrele(illi, { ...BOS_AKTIF_FILTRE, iller: ["İstanbul"] }).map((i) => i.id),
+    ).toEqual(["d"]);
+  });
 });
 
 describe("ilanlariSirala", () => {
@@ -107,6 +118,7 @@ describe("URL durumu", () => {
       duzeyler: [],
       zorluklar: ["ZOR"],
       uygulamaTipleri: [],
+      iller: [],
     };
     const params = filtreyiUrleYaz(filtre, "yayinevi");
     expect(params.get("yayinevi")).toBe("ozdebir,paraf");
@@ -128,6 +140,7 @@ describe("aktifFiltreSayisi", () => {
         duzeyler: [],
         zorluklar: ["ZOR"],
         uygulamaTipleri: [],
+        iller: [],
       }),
     ).toBe(4);
   });

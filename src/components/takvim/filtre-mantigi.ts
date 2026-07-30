@@ -9,6 +9,7 @@ export interface AktifFiltre {
   duzeyler: string[];
   zorluklar: string[];
   uygulamaTipleri: string[];
+  iller: string[];
 }
 
 export const BOS_AKTIF_FILTRE: AktifFiltre = {
@@ -17,6 +18,7 @@ export const BOS_AKTIF_FILTRE: AktifFiltre = {
   duzeyler: [],
   zorluklar: [],
   uygulamaTipleri: [],
+  iller: [],
 };
 
 export type Siralama = "tarih" | "yayinevi";
@@ -33,6 +35,7 @@ export function ilanlariFiltrele(ilanlar: IlanOzet[], filtre: AktifFiltre): Ilan
     if (filtre.uygulamaTipleri.length && !filtre.uygulamaTipleri.includes(ilan.uygulamaTipi)) {
       return false;
     }
+    if (filtre.iller.length && (!ilan.il || !filtre.iller.includes(ilan.il))) return false;
     if (
       filtre.duzeyler.length &&
       !ilan.duzeyler.some((duzey) => filtre.duzeyler.includes(duzey.slug))
@@ -63,7 +66,8 @@ export function aktifFiltreSayisi(filtre: AktifFiltre): number {
     filtre.formatlar.length +
     filtre.duzeyler.length +
     filtre.zorluklar.length +
-    filtre.uygulamaTipleri.length
+    filtre.uygulamaTipleri.length +
+    filtre.iller.length
   );
 }
 
@@ -76,6 +80,7 @@ export function filtreyiUrleYaz(filtre: AktifFiltre, siralama: Siralama): URLSea
   if (filtre.duzeyler.length) params.set("duzey", filtre.duzeyler.join(","));
   if (filtre.zorluklar.length) params.set("zorluk", filtre.zorluklar.join(","));
   if (filtre.uygulamaTipleri.length) params.set("uygulama", filtre.uygulamaTipleri.join(","));
+  if (filtre.iller.length) params.set("il", filtre.iller.join(","));
   if (siralama !== "tarih") params.set("sirala", siralama);
   return params;
 }
@@ -92,5 +97,6 @@ export function urldenFiltreOku(params: URLSearchParams): AktifFiltre {
     duzeyler: coz("duzey"),
     zorluklar: coz("zorluk"),
     uygulamaTipleri: coz("uygulama"),
+    iller: coz("il"),
   };
 }

@@ -80,6 +80,7 @@ export default async function OnizlemeSayfasi({ params }: { params: Promise<{ id
             sonSiparisTarihi: ilan.sonSiparisTarihi?.toISOString().slice(0, 10) ?? null,
             cevapAnahtariZamani: ilan.cevapAnahtariZamani?.toISOString() ?? null,
             uygulamaTipi: ilan.uygulamaTipi,
+            il: ilan.il,
             zorluk: ilan.zorluk,
             oneCikar: ilan.oneCikar,
             puanOrtalama: ilan.puanOrtalama,

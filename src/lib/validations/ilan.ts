@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { UygulamaTipi, YayinDurumu, Zorluk } from "@/generated/prisma/enums";
+import { ILLER } from "@/lib/iller";
 
 // §7 güvenlik: "Girdi doğrulama Zod ile sunucu tarafında HER ZAMAN."
 // İstemci ve sunucu aynı şemayı kullanır.
@@ -75,6 +76,11 @@ export const ilanSemasi = z
       .transform((deger) => (deger ? deger : undefined)),
 
     uygulamaTipi: z.enum(UygulamaTipi, { message: "Uygulama tipi seçin." }),
+    // Yalnızca Kurumsal'da anlamlı — bkz. superRefine.
+    il: z
+      .union([z.literal(""), z.enum(ILLER)])
+      .optional()
+      .transform((deger) => (deger ? deger : undefined)),
     zorluk: z
       .union([z.literal(""), z.enum(Zorluk)])
       .optional()
