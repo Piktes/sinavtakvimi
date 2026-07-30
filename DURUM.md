@@ -106,6 +106,34 @@ gerçekten sağlanıyor: taksonominin tamamı admin panelden yönetiliyor.
 Kabul kriteri #2 ve #3 tarayıcıda doğrulandı: panelden eklenen koleksiyon,
 kod değişikliği ve migration olmadan sitenin üst menüsünde belirdi.
 
+### Ek — Excel/CSV içe aktarma (§4.2, sıradan öne alındı)
+
+Yol haritasında Adım 10'daydı; toplu veri girişini kolaylaştırdığı için erken
+yapıldı.
+
+- **Şablon indirme** (`/yonetim/ilanlar/ice-aktar/sablon`): sütun başlıkları +
+  hangi alanın zorunlu olduğu + panelde KAYITLI GERÇEK kurum/etiketlerden
+  üretilmiş örnek satır. İndirilen dosya olduğu gibi yüklendiğinde geçerli.
+  UTF-8 BOM + noktalı virgül — Türkçe Excel'in beklediği biçim (BOM'suz Excel
+  ç/ş/ğ'yi bozuk gösterir, virgülle yazılan dosyayı tek sütuna sıkıştırır).
+- **İki adımlı akış**: yükle → rapor (hiçbir şey kaydedilmez) → onayla.
+  Aktarılanlar TASLAK gelir.
+- **Satır/sütun bazlı hata raporu**: satır numarası Excel'dekiyle aynı,
+  hangi sütun, ne girilmiş, neden geçersiz. Bir satırdaki tüm hatalar aynı
+  anda gösterilir (kullanıcı tek tek deneme yapmasın).
+- Tarih esnekliği: `GG.AA.YYYY`, `GG/AA/YYYY`, `YYYY-AA-GG` kabul edilir;
+  takvimde olmayan gün (31.02) reddedilir.
+- Kurum/etiket eşleşmesi ad veya slug üzerinden, Türkçe büyük/küçük harf
+  katlamasıyla (`"I".toLowerCase()` İngilizce'de `i` verir, Türkçe'de `ı`
+  olmalı — `toLocaleLowerCase("tr")` kullanılıyor).
+- Çakışma tespiti: aynı slug DB'de varsa ayrıca listelenir, "atla" seçeneği
+  sunulur.
+- `src/lib/csv.ts` bağımlılıksız (tırnaklı alan, gömülü ayraç/satır sonu,
+  çift tırnak kaçışı) — 18 birim testiyle kapsanmış.
+
+**Eksik kalan:** §4.2'deki "parti kaydıyla toplu geri alma". Yeni spec'in 10
+tablo listesinde `ImportBatch` yok; eklenirse geri alma da yazılabilir.
+
 ---
 
 ## Sırada

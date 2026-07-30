@@ -71,6 +71,9 @@ export default async function IlanlarSayfasi({
         <h1 className="font-baslik text-2xl font-semibold text-text">İlanlar</h1>
         <div className="flex gap-2">
           <Button varyant="ikincil" boyut="sm">
+            <Link href="/yonetim/ilanlar/ice-aktar">Excel/CSV içe aktar</Link>
+          </Button>
+          <Button varyant="ikincil" boyut="sm">
             <Link href="/yonetim/ilanlar/toplu">Toplu seri girişi</Link>
           </Button>
           <Button boyut="sm">
