@@ -85,24 +85,30 @@ Askıya alınan hesap elindeki JWT geçerli olsa bile anında kesilir.
 Sapmadan memnun değilsen alternatif: Auth.js'i bırakıp kendi
 `Session` tablosu + çerez akışını yazmak (tablolar şemada zaten var).
 
+### Adım 7 — Admin: kurumlar, etiketler, koleksiyonlar, takvim notları
+
+Şartnamenin "sitede görünen hiçbir şey kodda sabit olmayacak" ilkesi artık
+gerçekten sağlanıyor: taksonominin tamamı admin panelden yönetiliyor.
+
+- **Kurumlar** CRUD + logo yükleme (`src/lib/gorsel-yukle.ts`: sharp ile
+  yeniden kodlama → EXIF/konum verisi düşer, §7) + vitrin sırası.
+  İlanı olan kurum silinemez.
+- **Kurum tipleri** CRUD — §2'nin "enum değil, tablo" kararının karşılığı.
+- **Etiketler** — GRUP/DÜZEY/FORMAT tek ekranda sekmeli. Kullanımdaki etiket
+  silinemez (pasife alınır).
+- **Koleksiyonlar** — filtre kurucu + **canlı önizleme**. Önizleme ile gerçek
+  sorgu AYNI fonksiyonu kullanır (`filtreyiWhereCevir`); ikinci bir yorum
+  yazılmadı, yoksa önizleme yalan söyleyebilirdi. Doğrulandı: filtresiz 66 →
+  YKS 28 → YKS+Zor 14.
+- **Takvim notları** CRUD — aylık ızgarada bant olarak render ediliyordu,
+  artık veri girişi de var.
+
+Kabul kriteri #2 ve #3 tarayıcıda doğrulandı: panelden eklenen koleksiyon,
+kod değişikliği ve migration olmadan sitenin üst menüsünde belirdi.
+
 ---
 
 ## Sırada
-
-### Adım 7 — Admin: kurumlar, etiketler, koleksiyonlar, takvim notları
-
-- Kurumlar CRUD + logo yükleme (sharp ile boyutlandırma + **EXIF temizliği**,
-  §7). Yüklenen logolar `public/uploads/` (prod'da S3/R2'ye taşınacak).
-- Kurum tipleri CRUD (admin yeni tip ekleyebilmeli — enum değil, tablo).
-- Etiketler: GRUP/DÜZEY/FORMAT tek ekranda sekmeyle, sürükle-bırak sıralama.
-- **Koleksiyonlar: filtre kurucu + canlı önizleme** ("bu filtre şu an 47 ilan
-  getiriyor"). §6: "bu listedeki en önemli ekran — önizleme olmadan admin ne
-  tanımladığını göremez." Filtre şeması
-  `src/lib/validations/koleksiyon.ts:koleksiyonFiltresiSemasi`; Prisma
-  where'ine çeviren fonksiyon `src/lib/veri/ilan.ts:filtreyiWhereCevir`
-  (aynı fonksiyon önizlemede de kullanılmalı, ikinci bir yorum yazılmamalı).
-- Takvim notları CRUD (tatil/bayram/tahmini) — aylık ızgarada bant olarak
-  zaten render ediliyor, veri girişi eksik.
 
 ### Adım 8 — Üyelik + bildirim
 

@@ -12,28 +12,32 @@ export interface NavOgesi {
 
 // §6 modül listesi. Yan menü buradan üretilir ve role göre filtrelenir.
 export const YONETIM_NAV: NavOgesi[] = [
-  { href: "/yonetim", etiket: "Gösterge paneli", roller: ["ADMIN", "EDITOR", "MODERATOR"], hazir: true },
+  {
+    href: "/yonetim",
+    etiket: "Gösterge paneli",
+    roller: ["ADMIN", "EDITOR", "MODERATOR"],
+    hazir: true,
+  },
   { href: "/yonetim/ilanlar", etiket: "İlanlar", roller: ["ADMIN", "EDITOR"], hazir: true },
+  { href: "/yonetim/kurumlar", etiket: "Kurumlar", roller: ["ADMIN", "EDITOR"], hazir: true },
   {
-    href: "/yonetim/kurumlar",
-    etiket: "Kurumlar",
+    href: "/yonetim/kurum-tipleri",
+    etiket: "Kurum tipleri",
     roller: ["ADMIN", "EDITOR"],
-    hazir: false,
-    not: "Adım 7",
+    hazir: true,
   },
-  {
-    href: "/yonetim/etiketler",
-    etiket: "Etiketler",
-    roller: ["ADMIN", "EDITOR"],
-    hazir: false,
-    not: "Adım 7",
-  },
+  { href: "/yonetim/etiketler", etiket: "Etiketler", roller: ["ADMIN", "EDITOR"], hazir: true },
   {
     href: "/yonetim/koleksiyonlar",
     etiket: "Koleksiyonlar",
     roller: ["ADMIN", "EDITOR"],
-    hazir: false,
-    not: "Adım 7",
+    hazir: true,
+  },
+  {
+    href: "/yonetim/takvim-notlari",
+    etiket: "Takvim notları",
+    roller: ["ADMIN", "EDITOR"],
+    hazir: true,
   },
   {
     href: "/yonetim/yorumlar",

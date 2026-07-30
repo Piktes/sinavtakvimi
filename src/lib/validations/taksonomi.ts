@@ -5,26 +5,24 @@ import { EtiketTipi, Gorunum, TakvimNotuTipi } from "@/generated/prisma/enums";
 // kullanır. Bu dosya Adım 7 ekranlarının (kurum, kurum tipi, etiket,
 // koleksiyon, takvim notu) ortak şemalarını tutar.
 
-const slugAlani = z
-  .string()
-  .trim()
-  .max(200)
-  .regex(/^[a-z0-9-]*$/, "Slug yalnızca küçük harf, rakam ve tire içerebilir.")
-  .optional()
-  .transform((deger) => (deger ? deger : undefined));
+// `formData.get()` eksik alan için `null` döndürür; Zod'un `.optional()`'ı
+// yalnızca `undefined` kabul ettiği için formda bulunmayan opsiyonel alanlar
+// aksi hâlde doğrulamayı düşürür. Bu yüzden null önce undefined'a çevriliyor.
+const bosaCevir = <T extends z.ZodTypeAny>(sema: T) =>
+  z.preprocess((deger) => (deger === null || deger === "" ? undefined : deger), sema);
 
-const metinOpsiyonel = (enFazla: number) =>
+const slugAlani = bosaCevir(
   z
     .string()
     .trim()
-    .max(enFazla)
-    .optional()
-    .transform((deger) => (deger ? deger : undefined));
+    .max(200)
+    .regex(/^[a-z0-9-]*$/, "Slug yalnızca küçük harf, rakam ve tire içerebilir.")
+    .optional(),
+);
 
-const urlOpsiyonel = z
-  .union([z.literal(""), z.url("Geçerli bir URL girin.")])
-  .optional()
-  .transform((deger) => (deger ? deger : undefined));
+const metinOpsiyonel = (enFazla: number) => bosaCevir(z.string().trim().max(enFazla).optional());
+
+const urlOpsiyonel = bosaCevir(z.url("Geçerli bir URL girin.").optional());
 
 const dogruYanlis = z.preprocess((deger) => deger === "true", z.boolean());
 const siraAlani = z.coerce.number().int().min(0).default(0);
