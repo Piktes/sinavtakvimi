@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink } from "lucide-react";
+import { abonelikDurumu } from "@/app/(genel)/abonelik-actions";
+import { BildirimDugmesi } from "@/components/bildirim-dugmesi";
 import { IlanKarti } from "@/components/ilan-karti";
 import { TakvimeEkle } from "@/components/takvime-ekle";
 import { Badge } from "@/components/ui/badge";
@@ -39,9 +41,10 @@ export default async function IlanDetay({ params }: { params: Promise<{ slug: st
   const ilan = await ilanDetayi(slug);
   if (!ilan) notFound();
 
-  const [seriDigerleri, ayniHafta] = await Promise.all([
+  const [seriDigerleri, ayniHafta, abonelik] = await Promise.all([
     seriDigerIlanlari(ilan.id, ilan.kurum.id, ilan.format.id),
     ayniHaftadakiIlanlar(ilan.id, ilan.sinavTarihi),
+    abonelikDurumu("ilan", ilan.id),
   ]);
 
   const simdi = new Date();
@@ -168,6 +171,9 @@ export default async function IlanDetay({ params }: { params: Promise<{ slug: st
           akisUrl={`/api/ics/yayinevi/${ilan.kurum.slug}.ics`}
           akisEtiketi={`${ilan.kurum.ad} takvimine abone ol`}
         />
+
+        {/* §4.8 abonelik seviyesi: tek ilan. */}
+        <BildirimDugmesi hedef="ilan" hedefId={ilan.id} ad={ilan.baslik} baslangic={abonelik} />
         {ilan.detayUrl && (
           <a
             href={ilan.detayUrl}

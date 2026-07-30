@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBaslik, CardGovde } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { ofsetleriOzetle } from "@/lib/abonelik";
 import { prisma } from "@/lib/prisma";
 import { requireUye } from "@/lib/rbac";
 import { formatTarih } from "@/lib/tarih";
@@ -17,20 +18,29 @@ export const metadata: Metadata = { title: "Hesabım" };
 export const dynamic = "force-dynamic";
 
 function abonelikBasligi(abonelik: {
-  ilan: { baslik: string; sinavTarihi: Date } | null;
-  kurum: { ad: string } | null;
-  koleksiyon: { ad: string } | null;
-}): { tur: string; ad: string; ek?: string } {
+  ilan: { baslik: string; slug: string; sinavTarihi: Date } | null;
+  kurum: { ad: string; slug: string } | null;
+  koleksiyon: { ad: string; slug: string } | null;
+}): { tur: string; ad: string; yol: string | null; ek?: string } {
   if (abonelik.ilan) {
     return {
       tur: "İlan",
       ad: abonelik.ilan.baslik,
+      yol: `/ilan/${abonelik.ilan.slug}`,
       ek: formatTarih(abonelik.ilan.sinavTarihi),
     };
   }
-  if (abonelik.kurum) return { tur: "Yayınevi", ad: abonelik.kurum.ad };
-  if (abonelik.koleksiyon) return { tur: "Koleksiyon", ad: abonelik.koleksiyon.ad };
-  return { tur: "Bilinmiyor", ad: "—" };
+  if (abonelik.kurum) {
+    return { tur: "Yayınevi", ad: abonelik.kurum.ad, yol: `/yayinevi/${abonelik.kurum.slug}` };
+  }
+  if (abonelik.koleksiyon) {
+    return {
+      tur: "Koleksiyon",
+      ad: abonelik.koleksiyon.ad,
+      yol: `/k/${abonelik.koleksiyon.slug}`,
+    };
+  }
+  return { tur: "Bilinmiyor", ad: "—", yol: null };
 }
 
 export default async function HesabimSayfasi() {
@@ -49,9 +59,9 @@ export default async function HesabimSayfasi() {
         id: true,
         ofsetler: true,
         aktifMi: true,
-        ilan: { select: { baslik: true, sinavTarihi: true } },
-        kurum: { select: { ad: true } },
-        koleksiyon: { select: { ad: true } },
+        ilan: { select: { baslik: true, slug: true, sinavTarihi: true } },
+        kurum: { select: { ad: true, slug: true } },
+        koleksiyon: { select: { ad: true, slug: true } },
       },
     }),
   ]);
@@ -111,20 +121,27 @@ export default async function HesabimSayfasi() {
           ) : (
             <ul className="flex flex-col divide-y divide-border">
               {abonelikler.map((abonelik) => {
-                const { tur, ad, ek } = abonelikBasligi(abonelik);
+                const { tur, ad, yol, ek } = abonelikBasligi(abonelik);
                 return (
                   <li key={abonelik.id} className="flex items-center gap-3 py-3 first:pt-0">
                     <Bell size={16} strokeWidth={1.75} className="shrink-0 text-text-faint" />
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <Badge varyant="cizgi">{tur}</Badge>
-                        <span className="truncate text-sm font-medium text-text">{ad}</span>
+                        {yol ? (
+                          <Link
+                            href={yol}
+                            className="truncate text-sm font-medium text-text hover:underline"
+                          >
+                            {ad}
+                          </Link>
+                        ) : (
+                          <span className="truncate text-sm font-medium text-text">{ad}</span>
+                        )}
                       </div>
                       <p className="text-xs text-text-muted">
                         {ek ? `${ek} · ` : ""}
-                        {abonelik.ofsetler.length > 0
-                          ? `${abonelik.ofsetler.join(", ")} gün önce hatırlat`
-                          : "Hatırlatma kapalı"}
+                        {ofsetleriOzetle(abonelik.ofsetler)}
                       </p>
                     </div>
                     <form action={abonelikKaldir}>

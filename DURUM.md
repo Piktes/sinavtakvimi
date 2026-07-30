@@ -188,7 +188,28 @@ abone ol". Dikkat edilenler:
   küme döndürebilirdi.
 - Google Takvim tarafında **OAuth yok** (§4.7) — yalnızca şablon bağlantısı.
 
-**Kalan:** Dört seviyeli abonelik: tek ilan · yayınevi · koleksiyon · kapalı.
+**8d — bitti.** Dört seviyeli abonelik (§4.8): tek ilan · yayınevi · koleksiyon ·
+kapalı. `lib/abonelik.ts` (sabitler) + `(genel)/abonelik-actions.ts` +
+`components/bildirim-dugmesi.tsx`; ilan detayı, yayınevi ve koleksiyon
+sayfalarında. Kararlar:
+
+- **"Kapalı" ayrı bir kayıt değil, kaydın yokluğu.** Menüde dördüncü bir radyo
+  düğmesi yerine tek bir "Bildirimi kapat" eylemi var; DB'de kayıt silinir,
+  bekleyen `Gonderim` satırları cascade ile gider.
+- Ofsetler yalnızca 7/3/1/0 (§4.8), varsayılan 3 ve 1. Sunucuda Zod ile
+  süzülüyor — her ofset ayrı planlanmış gönderim demek, keyfi değer kabul
+  edilemez.
+- `hedefGecerliMi()`: istemciden gelen id yayında/aktif mi diye doğrulanıyor,
+  yoksa rastgele id ile yetim abonelik açılabilirdi.
+- Doğrulanmamış e-postaya abonelik açılmaz. Genel üye zaten doğrulamadan giriş
+  yapamıyor; bu kural pratikte **doğrulanmamış panel hesapları** için geçerli.
+- Girişsiz kullanıcı düğmeyi görür; tıklayınca `/giris?devam=<mevcut yol>`.
+
+**Düzeltilen hata:** açılır menüler `z-20` idi, yapışkan filtre çubuğu da
+`z-20` (`takvim/filtre-cubugu.tsx`) — koleksiyon sayfasında filtre çubuğu
+menüyü kapatıyordu. Üç menü de `z-40`'a alındı (yapışkan üst bar z-30).
+
+**Kalan:** pg-boss planlayıcı (8e) + tarih değişikliği yeniden planlaması (8f).
 
 - pg-boss günlük planlayıcı (06:00), gönderim 08:00 ±15 dk.
 - **Idempotency zorunlu** — `Gonderim` tablosundaki unique kısıt korunmalı;

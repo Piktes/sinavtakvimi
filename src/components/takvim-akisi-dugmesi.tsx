@@ -4,6 +4,9 @@ import { Check, CalendarPlus, Copy } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
+// Katman sırası: yapışkan üst bar z-30, yapışkan filtre çubuğu z-20 (bkz.
+// takvim/filtre-cubugu.tsx). Açılır menü ikisinin de üstünde durmalı — z-20
+// verildiğinde koleksiyon sayfasında filtre çubuğu menüyü kapatıyordu.
 // §4.7: "abone olunabilir akışlar — kullanıcı bir kez ekler, tarih değişince
 // takvimi kendiliğinden güncellenir."
 //
@@ -58,7 +61,7 @@ export function TakvimAkisiDugmesi({ akisUrl, ad }: { akisUrl: string; ad: strin
       {acik && (
         <div
           role="menu"
-          className="absolute right-0 top-full z-20 mt-1 flex w-80 flex-col gap-2 rounded-md border border-border bg-surface p-3 shadow-md"
+          className="absolute right-0 top-full z-40 mt-1 flex w-80 flex-col gap-2 rounded-md border border-border bg-surface p-3 shadow-md"
         >
           <p className="text-sm text-text">
             <span className="font-medium">{ad}</span> takvimini kendi takvim uygulamanıza ekleyin.

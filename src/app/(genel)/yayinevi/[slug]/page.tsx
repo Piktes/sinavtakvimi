@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CalendarX } from "lucide-react";
+import { abonelikDurumu } from "@/app/(genel)/abonelik-actions";
+import { BildirimDugmesi } from "@/components/bildirim-dugmesi";
 import { IlanKarti } from "@/components/ilan-karti";
 import { TakvimAkisiDugmesi } from "@/components/takvim-akisi-dugmesi";
 import { Badge } from "@/components/ui/badge";
@@ -43,7 +45,10 @@ export default async function YayineviSayfasi({ params }: { params: Promise<{ sl
   });
   if (!kurum || !kurum.aktifMi) notFound();
 
-  const ilanlar = await kurumunIlanlari(slug);
+  const [ilanlar, abonelik] = await Promise.all([
+    kurumunIlanlari(slug),
+    abonelikDurumu("kurum", kurum.id),
+  ]);
   const simdi = new Date();
   const bugun = simdi.toISOString().slice(0, 10);
 
@@ -66,9 +71,16 @@ export default async function YayineviSayfasi({ params }: { params: Promise<{ sl
           </div>
         </div>
 
-        {/* §4.7 abone olunabilir akış. */}
-        <div className="ml-auto">
+        {/* §4.7 abone olunabilir akış + §4.8 yayınevi seviyesi abonelik. */}
+        <div className="ml-auto flex items-center gap-2">
           <TakvimAkisiDugmesi akisUrl={`/api/ics/yayinevi/${kurum.slug}.ics`} ad={kurum.ad} />
+          <BildirimDugmesi
+            hedef="kurum"
+            hedefId={kurum.id}
+            ad={kurum.ad}
+            baslangic={abonelik}
+            boyut="sm"
+          />
         </div>
       </header>
 

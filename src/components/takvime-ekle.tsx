@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button";
 
 // §4.7: "Google Takvim şablon bağlantısı + .ics indirme. OAuth yok."
 // İki seçenek tek düğmenin altında; menü dışına tıklanınca kapanır.
+//
+// Katman sırası: yapışkan üst bar z-30, yapışkan filtre çubuğu z-20 (bkz.
+// takvim/filtre-cubugu.tsx). Açılır menü ikisinin de üstünde durmalı — z-20
+// verildiğinde koleksiyon sayfasında filtre çubuğu menüyü kapatıyordu.
 export function TakvimeEkle({
   googleUrl,
   icsUrl,
@@ -69,7 +73,7 @@ export function TakvimeEkle({
       {acik && (
         <div
           role="menu"
-          className="absolute left-0 top-full z-20 mt-1 flex w-72 flex-col gap-1 rounded-md border border-border bg-surface p-1 shadow-md"
+          className="absolute left-0 top-full z-40 mt-1 flex w-72 flex-col gap-1 rounded-md border border-border bg-surface p-1 shadow-md"
         >
           <a
             role="menuitem"

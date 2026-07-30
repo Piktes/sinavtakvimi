@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { TakvimSayfasi } from "@/app/(genel)/takvim/takvim-sayfasi";
+import { abonelikDurumu } from "@/app/(genel)/abonelik-actions";
+import { BildirimDugmesi } from "@/components/bildirim-dugmesi";
 import { TakvimAkisiDugmesi } from "@/components/takvim-akisi-dugmesi";
 import { filtreyiWhereCevir, koleksiyonBul } from "@/lib/veri/ilan";
 
@@ -32,6 +34,9 @@ export default async function KoleksiyonSayfasi({
   const koleksiyon = await koleksiyonBul(slug);
   if (!koleksiyon) notFound();
 
+  // §4.8: "Koleksiyon aboneliği en güçlüsü: kullanıcı bir kez abone olur,
+  // admin yeni ilan girdikçe otomatik kapsanır."
+  const abonelik = await abonelikDurumu("koleksiyon", koleksiyon.id);
   const simdi = new Date();
 
   return (
@@ -44,7 +49,16 @@ export default async function KoleksiyonSayfasi({
       // §4.7: koleksiyonun abone olunabilir akışı — akış, sayfadakiyle
       // aynı filtre çevirisini kullanır (lib/veri/ics.ts).
       baslikEylemi={
-        <TakvimAkisiDugmesi akisUrl={`/api/ics/koleksiyon/${slug}.ics`} ad={koleksiyon.ad} />
+        <div className="flex items-center gap-2">
+          <TakvimAkisiDugmesi akisUrl={`/api/ics/koleksiyon/${slug}.ics`} ad={koleksiyon.ad} />
+          <BildirimDugmesi
+            hedef="koleksiyon"
+            hedefId={koleksiyon.id}
+            ad={koleksiyon.ad}
+            baslangic={abonelik}
+            boyut="sm"
+          />
+        </div>
       }
     />
   );
