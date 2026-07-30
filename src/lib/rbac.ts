@@ -30,10 +30,17 @@ export async function requireRol(izinliRoller: readonly PanelRolu[]): Promise<Pa
       rol: true,
       durum: true,
       sifreDegistirmeZorunlu: true,
+      oturumSurumu: true,
     },
   });
 
   if (!kullanici || kullanici.durum !== "AKTIF") redirect("/yonetim/giris");
+
+  // Token'daki sürüm DB'dekinden eskiyse oturum iptal edilmiştir (ör. şifre
+  // değişti). JWT kriptografik olarak hâlâ geçerli olsa da burada kesilir.
+  const tokenSurumu = (oturum.user as { oturumSurumu?: number }).oturumSurumu;
+  if (tokenSurumu !== kullanici.oturumSurumu) redirect("/yonetim/giris");
+
   if (kullanici.rol === "KULLANICI") redirect("/yonetim/yetkisiz");
   if (kullanici.sifreDegistirmeZorunlu) redirect("/yonetim/sifre-degistir");
   if (!izinliRoller.includes(kullanici.rol as PanelRolu)) redirect("/yonetim/yetkisiz");

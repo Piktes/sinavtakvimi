@@ -24,18 +24,28 @@ export const authConfig = {
     // İnce ve güvenilir kontrol server action/sayfa içindeki requireRol().
     jwt({ token, user }) {
       if (user) {
-        const genisletilmis = user as typeof user & { rol?: string };
+        const genisletilmis = user as typeof user & { rol?: string; oturumSurumu?: number };
         token.rol = genisletilmis.rol;
+        token.oturumSurumu = genisletilmis.oturumSurumu;
       }
       return token;
     },
     session({ session, token }) {
       // `next-auth/jwt` modül augmentation'ı bir re-export barrel'ini
       // hedeflediği için TS ile güvenilir birleşmiyor; elle cast ediliyor.
-      const t = token as typeof token & { rol?: string; sub?: string };
+      const t = token as typeof token & {
+        rol?: string;
+        sub?: string;
+        oturumSurumu?: number;
+      };
       if (session.user) {
-        session.user.id = t.sub ?? "";
-        (session.user as typeof session.user & { rol?: string }).rol = t.rol;
+        const u = session.user as typeof session.user & {
+          rol?: string;
+          oturumSurumu?: number;
+        };
+        u.id = t.sub ?? "";
+        u.rol = t.rol;
+        u.oturumSurumu = t.oturumSurumu;
       }
       return session;
     },

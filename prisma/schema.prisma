@@ -276,6 +276,11 @@ model Kullanici {
   rol                    Rol             @default(KULLANICI)
   durum                  KullaniciDurumu @default(AKTIF)
   sifreDegistirmeZorunlu Boolean         @default(false) @map("sifre_degistirme_zorunlu")
+  // Oturum sürümü: token'a gömülür, her korumalı istekte DB'dekiyle
+  // karşılaştırılır. Şifre değişince artırılır → o ana kadar dağıtılmış tüm
+  // oturumlar anında geçersizleşir. Credentials sağlayıcısı database session'a
+  // izin vermediği için (bkz. DURUM.md) iptal mekanizması bu alanla sağlanıyor.
+  oturumSurumu           Int             @default(1) @map("oturum_surumu")
   olusturulma            DateTime        @default(now()) @db.Timestamptz(6)
   sonGiris               DateTime?       @map("son_giris") @db.Timestamptz(6)
 

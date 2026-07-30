@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 export default async function GirisSayfasi({
   searchParams,
 }: {
-  searchParams: Promise<{ devam?: string }>;
+  searchParams: Promise<{ devam?: string; sifre?: string }>;
 }) {
-  const { devam } = await searchParams;
+  const { devam, sifre } = await searchParams;
 
   // Açık yönlendirme (open redirect) engellenir: yalnızca site içi yollar.
   const guvenliDevam = devam?.startsWith("/yonetim") ? devam : "/yonetim";
@@ -25,6 +25,13 @@ export default async function GirisSayfasi({
             <h1 className="font-baslik text-xl font-semibold text-text">Yönetim paneli</h1>
             <p className="text-sm text-text-muted">Devam etmek için giriş yapın.</p>
           </div>
+
+          {sifre === "degisti" && (
+            <p role="status" className="rounded-md bg-success-bg px-3 py-2 text-sm text-success">
+              Şifreniz değişti. Güvenlik için diğer cihazlardaki oturumlar da kapatıldı; yeni
+              şifrenizle giriş yapın.
+            </p>
+          )}
           <GirisFormu devam={guvenliDevam} />
         </CardGovde>
       </Card>

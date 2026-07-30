@@ -37,6 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             sifreHash: true,
             rol: true,
             durum: true,
+            oturumSurumu: true,
           },
         });
 
@@ -66,6 +67,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: kullanici.eposta,
           name: kullanici.takmaAd,
           rol: kullanici.rol,
+          oturumSurumu: kullanici.oturumSurumu,
         };
       },
     }),
