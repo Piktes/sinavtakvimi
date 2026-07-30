@@ -63,3 +63,14 @@ export function hedefGunler(bugun: string, ofsetler: number[]): { ofset: number;
     .sort((a, b) => b - a)
     .map((ofset) => ({ ofset, gun: gunEkle(bugun, ofset) }));
 }
+
+/**
+ * İki `@db.Date` değeri farklı GÜN mü?
+ *
+ * `tarih-degisikligi.ts` yerine burada: orası `server-only` işaretli ve bu
+ * saf karşılaştırma DB'siz test edilebilmeli.
+ */
+export function tarihDegistiMi(eski: Date | null, yeni: Date | null): boolean {
+  if (!eski || !yeni) return false;
+  return eski.toISOString().slice(0, 10) !== yeni.toISOString().slice(0, 10);
+}

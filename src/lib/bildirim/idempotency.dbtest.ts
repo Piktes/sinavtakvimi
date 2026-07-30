@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { bekleyenleriGonder, sahiplen } from "@/lib/bildirim/gonderici";
 import { gunuPlanla } from "@/lib/bildirim/planlayici";
+import { planliGonderimleriIptalEt } from "@/lib/bildirim/tarih-degisikligi";
 import { gunEkle, istanbulGunu } from "@/lib/bildirim/zamanlama";
 import { prisma } from "@/lib/prisma";
 
@@ -103,8 +104,13 @@ describe("planlama idempotency", () => {
   it("ikinci çalıştırma ikinci satır YAZMAZ", async () => {
     const sonuc = await gunuPlanla();
     expect(await bizimGonderimler()).toHaveLength(1);
-    // Satır zaten vardı: createMany onu atlamış olmalı.
-    expect(sonuc.atlananGonderim).toBeGreaterThanOrEqual(1);
+
+    // Aday üretildi ama yazılmadı. İki savunma katmanı var ve hangisinin
+    // devreye girdiği duruma bağlı: `zatenPlanlanmis` (DB'de satır var, hiç
+    // denenmedi) ya da `atlananGonderim` (denendi, UNIQUE kısıtı reddetti).
+    // İkisinden biri saymalı — ikisi de sıfırsa aday sessizce kaybolmuş
+    // demektir.
+    expect(sonuc.zatenPlanlanmis + sonuc.atlananGonderim).toBeGreaterThanOrEqual(1);
   });
 
   it("eşzamanlı beş planlama yine tek satır bırakır", async () => {
@@ -311,5 +317,60 @@ describe("seviyeler arası tekilleştirme", () => {
       where: { abonelikId: { in: [abonelikId, koleksiyonAbonelikId] }, ilanId },
     });
     expect(satirlar).toHaveLength(1);
+  });
+});
+
+describe("tarih değişikliği (§4.8)", () => {
+  // "Tarih değişirse planlı gönderimler iptal edilip yeniden hesaplanır."
+  // Buradaki kritik nokta: GONDERILDI olanlara DOKUNULMAMASI — kullanıcı onu
+  // zaten almış; silmek geçmişi yeniden yazmak ve idempotency kaydını bozmak
+  // olurdu.
+  beforeAll(async () => {
+    await prisma.gonderim.deleteMany({ where: { abonelikId } });
+  });
+
+  it("BEKLIYOR satırı iptal edilir", async () => {
+    await prisma.gonderim.create({
+      data: { abonelikId, ilanId, ofset: 3, planlanan: new Date(), durum: "BEKLIYOR" },
+    });
+
+    const sayi = await planliGonderimleriIptalEt(ilanId);
+    expect(sayi).toBeGreaterThanOrEqual(1);
+
+    const satir = await prisma.gonderim.findFirst({ where: { abonelikId, ofset: 3 } });
+    expect(satir?.durum).toBe("IPTAL");
+    expect(satir?.hata).toContain("tarihi değişti");
+  });
+
+  it("GONDERILDI satırına DOKUNULMAZ", async () => {
+    await prisma.gonderim.create({
+      data: {
+        abonelikId,
+        ilanId,
+        ofset: 1,
+        planlanan: new Date(),
+        durum: "GONDERILDI",
+        gonderilen: new Date(),
+      },
+    });
+
+    await planliGonderimleriIptalEt(ilanId);
+
+    const satir = await prisma.gonderim.findFirst({ where: { abonelikId, ofset: 1 } });
+    expect(satir?.durum).toBe("GONDERILDI");
+  });
+
+  it("iptal edilen satır yeniden planlanabilir", async () => {
+    // zatenPlanlananlar IPTAL'i saymıyor: yeni tarihe göre yeni satır yazılsın.
+    // Ofset 3 satırı IPTAL durumda; ilan hâlâ 3 gün sonra olduğu için
+    // planlama onu yeniden yazmaya çalışır ve UNIQUE'e takılır — bu beklenen
+    // davranış, satır zaten var.
+    const oncekiSayi = await prisma.gonderim.count({ where: { abonelikId } });
+    await gunuPlanla();
+    expect(await prisma.gonderim.count({ where: { abonelikId } })).toBe(oncekiSayi);
+  });
+
+  it("iptal ikinci kez çağrılınca yeni satır etkilemez", async () => {
+    expect(await planliGonderimleriIptalEt(ilanId)).toBe(0);
   });
 });

@@ -22,9 +22,12 @@ export interface PlanlamaSonucu {
   gun: string;
   incelenenAbonelik: number;
   olusturulanGonderim: number;
+  /** UNIQUE(abonelikId, ilanId, ofset) yüzünden createMany'nin atladıkları. */
   atlananGonderim: number;
-  /** Aynı sınav için başka bir abonelikten zaten planlanmış olanlar. */
+  /** Aynı turda başka bir SEVİYEDEN de gelen, en spesifiğe indirgenenler. */
   tekillestirilen: number;
+  /** Aynı (kullanıcı, ilan, ofset) için DB'de zaten satır olanlar. */
+  zatenPlanlanmis: number;
 }
 
 type AbonelikSatiri = Prisma.AbonelikGetPayload<{
@@ -151,17 +154,17 @@ export async function gunuPlanla(simdi = new Date()): Promise<PlanlamaSonucu> {
   const kazananlar = tekillestir(adaylar);
   const mevcutAnahtarlar = await zatenPlanlananlar(kazananlar);
 
-  const satirlar: Prisma.GonderimCreateManyInput[] = kazananlar
-    .filter(
-      (aday) => !mevcutAnahtarlar.has(kullaniciAnahtari(aday.kullaniciId, aday.ilanId, aday.ofset)),
-    )
-    .map((aday) => ({
-      abonelikId: aday.abonelikId,
-      ilanId: aday.ilanId,
-      ofset: aday.ofset,
-      planlanan: gonderimAni(bugun, gonderimAnahtari(aday.abonelikId, aday.ilanId, aday.ofset)),
-      durum: "BEKLIYOR",
-    }));
+  const yazilacaklar = kazananlar.filter(
+    (aday) => !mevcutAnahtarlar.has(kullaniciAnahtari(aday.kullaniciId, aday.ilanId, aday.ofset)),
+  );
+
+  const satirlar: Prisma.GonderimCreateManyInput[] = yazilacaklar.map((aday) => ({
+    abonelikId: aday.abonelikId,
+    ilanId: aday.ilanId,
+    ofset: aday.ofset,
+    planlanan: gonderimAni(bugun, gonderimAnahtari(aday.abonelikId, aday.ilanId, aday.ofset)),
+    durum: "BEKLIYOR",
+  }));
 
   const sonuc = await prisma.gonderim.createMany({ data: satirlar, skipDuplicates: true });
 
@@ -170,6 +173,7 @@ export async function gunuPlanla(simdi = new Date()): Promise<PlanlamaSonucu> {
     incelenenAbonelik: abonelikler.length,
     olusturulanGonderim: sonuc.count,
     atlananGonderim: satirlar.length - sonuc.count,
-    tekillestirilen: adaylar.length - satirlar.length,
+    tekillestirilen: adaylar.length - kazananlar.length,
+    zatenPlanlanmis: kazananlar.length - yazilacaklar.length,
   };
 }

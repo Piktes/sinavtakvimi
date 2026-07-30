@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Prisma } from "@/generated/prisma/client";
 import { denetimYaz } from "@/lib/denetim";
+import { tarihDegisikligiSiraya } from "@/lib/bildirim/kuyruk";
+import { planliGonderimleriIptalEt } from "@/lib/bildirim/tarih-degisikligi";
+import { tarihDegistiMi } from "@/lib/bildirim/zamanlama";
 import { prisma } from "@/lib/prisma";
 import { requireRol } from "@/lib/rbac";
 import { sezonTuret } from "@/lib/sezon";
@@ -165,6 +168,22 @@ export async function ilanKaydet(
         oncesi,
         sonrasi,
       });
+
+      // §4.8: "Tarih değişirse planlı gönderimler iptal edilip yeniden
+      // hesaplanır ve abonelere ayrı 'tarih değişti' bildirimi gider."
+      //
+      // İptal burada, SENKRON: tek UPDATE, hızlı, ve yanlış tarihe göre
+      // planlanmış hatırlatmalar bir an bile kuyrukta kalmamalı.
+      // Bildirim KUYRUKTA: yüzlerce aboneye SMTP üzerinden yazmak bu formu
+      // dakikalarca bekletirdi (bkz. lib/bildirim/kuyruk.ts).
+      if (tarihDegistiMi(oncesi.sinavTarihi, sonrasi.sinavTarihi)) {
+        await planliGonderimleriIptalEt(id);
+        await tarihDegisikligiSiraya({
+          ilanId: id,
+          eskiTarih: oncesi.sinavTarihi.toISOString(),
+          yeniTarih: sonrasi.sinavTarihi.toISOString(),
+        });
+      }
     } else {
       const olusturulan = await prisma.ilan.create({
         data: {

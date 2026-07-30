@@ -146,10 +146,6 @@ GERI_ALINDI olarak işaretlenir — izlenebilirlik korunur.
 şart koştuğu ve hangi ilanın hangi yüklemeden geldiği kaydedilmeden bu
 mümkün olmadığı için eklendi (`Gonderim` ile aynı gerekçe).
 
----
-
-## Sırada
-
 ### Adım 8 — Üyelik + bildirim
 
 **8a — bitti.** `lib/takma-ad.ts` (havuz üreteci), `lib/eposta.ts` (nodemailer;
@@ -239,17 +235,33 @@ gidiyordu (tarayıcıda görüldü). `tekillestir.ts` (kullanıcı, ilan, ofset)
 "testi yazılacak" dediği idempotency kanıtı. Sahte istemciyle sınamak bir şey
 kanıtlamazdı; kanıtlanması gereken **Postgres kısıtının kendisi**.
 
-**Kalan:** tarih değişikliği yeniden planlaması (8f).
+**8f — bitti.** Tarih değişikliği (§4.8). `lib/bildirim/tarih-degisikligi.ts`
 
-- pg-boss günlük planlayıcı (06:00), gönderim 08:00 ±15 dk.
-- **Idempotency zorunlu** — `Gonderim` tablosundaki unique kısıt korunmalı;
-  §4.8 "sistemin en kırılgan yeri, testi yazılacak" diyor.
-- Tarih değişirse planlı gönderimler iptal + yeniden hesap **ve** abonelere
-  ayrı "tarih değişti" bildirimi.
-- Her e-postada giriş gerektirmeyen imzalı abonelikten çık bağlantısı.
-- İlan detayındaki "Takvime ekle" burada etkinleşir: Google Takvim şablon
-  bağlantısı + `.ics` (OAuth **yok**, §4.7) + abone olunabilir akışlar
-  `/api/ics/koleksiyon/[slug].ics`, `/api/ics/yayinevi/[slug].ics`.
+- `lib/bildirim/kuyruk.ts`; `ilanKaydet` içine bağlandı.
+
+* **İptal SENKRON, bildirim KUYRUKTA.** İptal tek bir `updateMany` —
+  yanlış tarihe göre planlanmış hatırlatma bir an bile kuyrukta kalmamalı.
+  Bildirim pg-boss'a atılıyor: yüzlerce aboneye SMTP üzerinden yazmak admin'in
+  kaydet formunu dakikalarca bekletir, SMTP düşerse admin kaydı başarısız
+  sanardı. İşçi çalışmıyorsa iş kuyrukta bekler, kaybolmaz.
+* **GONDERILDI satırına dokunulmuyor** — kullanıcı onu zaten almış; silmek
+  geçmişi yeniden yazmak ve idempotency kaydını bozmak olurdu.
+* "Tarih değişti" e-postası **ofset tercihinden bağımsız** gider (§4.8
+  "kritik bilgi"); ayrı şablon.
+* Aynı kullanıcı üç seviyeden de abone olsa **tek** bildirim alır.
+* Kuyruk erişilemezse ilan kaydı **başarısız olmuyor** — bildirim altyapısı
+  içerik yönetimini kilitlememeli; konsola düşüyor ki sessiz kalmasın.
+
+**Planlayıcı sayaçları ayrıldı** (test yanlış şeyi ölçtüğü ortaya çıktı):
+`atlananGonderim` = UNIQUE'e takılanlar, `tekillestirilen` = aynı turda başka
+seviyeden gelenler, `zatenPlanlanmis` = DB'de zaten satırı olanlar. Üçü ayrı
+savunma katmanı; tek sayaçta toplamak hangisinin çalıştığını gizliyordu.
+
+**Adım 8 tamamlandı.** `pnpm test` 129, `pnpm test:db` 18.
+
+---
+
+## Sırada
 
 ### Adım 9 — Yorum + moderasyon
 
@@ -319,3 +331,23 @@ tüm biçimlendirmeyi tek yerden yapar. §3.7 gereği hiçbir bileşende
 
 **Geri sayım sunucu zamanından** — `kalanGun(hedef, simdi)` imzasındaki
 `simdi` parametresi zorunlu; istemci saatine güvenilmiyor (§4.5).
+
+**`server-only` işaretli modüller Node'da import edilemez** — paket kasten
+hata fırlatır. `pnpm worker` ve `pnpm bildirim:planla` bu yüzden
+`tsx --conditions=react-server` ile koşar (paket o koşulda boş modüle
+çözülür); `pnpm test:db` aynı işi `vitest.db.config.ts` içindeki alias ile
+yapar.
+
+**Kuyruğa `import "dotenv/config"` İLK import olmalı** — `config()` çağrısı
+olarak yazılırsa ESM tüm import'ları gövdeden önce değerlendirdiği için
+`@/lib/prisma` `DATABASE_URL` okunmadan başlatılır ve
+`SASL: client password must be a string` alınır.
+
+**Açılır menüler `z-40`** — yapışkan üst bar `z-30`, yapışkan filtre çubuğu
+`z-20`. Menüye `z-20` verildiğinde koleksiyon sayfasında filtre çubuğu menüyü
+kapatıyordu.
+
+**Bildirim işçisi web sunucusundan ayrı süreç** — `pnpm worker`. Next süreci
+içinde başlatılsaydı dev'de her yeniden derlemede zamanlayıcı yeniden kurulur,
+üretimde de her sunucu örneği aynı cron'u çalıştırırdı. Web süreci kuyruğa
+yalnızca **iş atar** (`lib/bildirim/kuyruk.ts`).

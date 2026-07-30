@@ -14,7 +14,7 @@ async function main() {
   console.log(
     `[planlama] ${sonuc.gun}: ${sonuc.incelenenAbonelik} abonelik → ` +
       `${sonuc.olusturulanGonderim} yeni, ${sonuc.atlananGonderim} zaten vardı, ` +
-      `${sonuc.tekillestirilen} tekilleştirildi`,
+      `${sonuc.zatenPlanlanmis} zaten planlıydı, ${sonuc.tekillestirilen} tekilleştirildi`,
   );
 
   if (process.argv.includes("--gonder")) {
