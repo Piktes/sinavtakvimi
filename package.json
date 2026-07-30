@@ -13,6 +13,7 @@
     "format:check": "prettier --check .",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "prisma db seed",
+    "db:seed-demo": "tsx prisma/seed-demo.ts",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "tutarlilik": "node scripts/tutarlilik-kontrol.mjs"
