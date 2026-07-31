@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Flame } from "lucide-react";
+import { HaftaAkisi } from "@/components/ana-sayfa/hafta-akisi";
 import { IlanKarti } from "@/components/ilan-karti";
 import { ScrollBelir } from "@/components/scroll-belir";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/cn";
 import { kurumRengi } from "@/lib/kurum-tonu";
 import { formatKisa, gunAnahtari, kalanGun } from "@/lib/tarih";
 import type { IlanOzet } from "@/lib/veri/ilan";
@@ -30,16 +30,31 @@ export function AnaSayfaV3({
 
   // §5 V3 "hafta şeridi" — adı üstünde BİR HAFTA (7 gün). Önceden 14 güne
   // uzuyordu, iki hafta göstermek şeridi gereksiz uzatıp anlamını bozuyordu.
+  // Güne tıklayınca alttaki liste filtrelenir (bkz. HaftaAkisi) — bu yüzden
+  // istemciye yalnızca serileştirilebilir alanlar (etiket: hazır metin,
+  // Date YOK) geçiyor.
   const gunler = Array.from({ length: 7 }, (_, index) => {
     const tarih = new Date(simdi);
     tarih.setUTCDate(tarih.getUTCDate() + index);
     const anahtar = gunAnahtari(tarih);
     return {
       anahtar,
-      tarih,
+      etiket: formatKisa(tarih),
+      buGun: anahtar === bugun,
       sayi: yaklasan.filter((ilan) => ilan.sinavTarihi === anahtar).length,
     };
   });
+
+  // Kartlar sunucuda render edilir; istemci yalnızca hangi günün hangi
+  // kartlara ait olduğunu bilip görünürlüğü değiştirir.
+  const kartlar = yaklasan.map((ilan) => ({
+    anahtar: ilan.sinavTarihi,
+    eleman: (
+      <ScrollBelir key={ilan.id} hareket="olcek">
+        <IlanKarti ilan={ilan} simdi={simdi} />
+      </ScrollBelir>
+    ),
+  }));
 
   return (
     <div className="flex flex-col gap-5">
@@ -72,37 +87,6 @@ export function AnaSayfaV3({
           </p>
         </div>
       )}
-
-      {/* Yapışkan hafta şeridi. */}
-      <div className="yapiskan-ust -mx-4 z-20 border-b border-border bg-bg px-4 py-2">
-        <ul className="flex gap-1 overflow-x-auto">
-          {gunler.map((gun) => (
-            <li key={gun.anahtar}>
-              <div
-                className={cn(
-                  "flex w-14 shrink-0 flex-col items-center gap-1 rounded-md border border-border px-2 py-2",
-                  gun.anahtar === bugun ? "bg-primary text-primary-fg" : "bg-surface",
-                )}
-              >
-                <span className="sayisal text-xs">{formatKisa(gun.tarih)}</span>
-                <span className="flex h-2 items-center gap-0.5">
-                  {Array.from({ length: Math.min(gun.sayi, 3) }).map((_, index) => (
-                    <span
-                      key={index}
-                      aria-hidden
-                      className={cn(
-                        "size-1 rounded-sm",
-                        gun.anahtar === bugun ? "bg-primary-fg" : "bg-accent",
-                      )}
-                    />
-                  ))}
-                </span>
-                <span className="sr-only">{gun.sayi} sınav</span>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
 
       {/* §5 V3: logolar duvar değil — kendiliğinden kayan yatay sıra.
        * Kesintisiz döngü için liste iki kez basılır; ikinci kopya ekran
@@ -157,15 +141,10 @@ export function AnaSayfaV3({
           </Link>
         </div>
 
-        {/* Tek sütun akış — mobil öncelikli. §5 V3 imzası: kartlar kaydırınca
-         * hafifçe ölçeklenir. */}
-        <div className="flex flex-col gap-3">
-          {yaklasan.map((ilan) => (
-            <ScrollBelir key={ilan.id} hareket="olcek">
-              <IlanKarti ilan={ilan} simdi={simdi} />
-            </ScrollBelir>
-          ))}
-        </div>
+        {/* Hafta şeridi + liste: güne tıklayınca liste o güne filtrelenir
+         * (bkz. HaftaAkisi). Tek sütun akış — mobil öncelikli, §5 V3 imzası:
+         * kartlar kaydırınca hafifçe ölçeklenir. */}
+        <HaftaAkisi gunler={gunler} kartlar={kartlar} />
       </section>
     </div>
   );

@@ -77,6 +77,6 @@
   /* --- §3.6 Yayınevi rozet rengi: ton slug'dan üretilir, doygunluk ve
    * açıklık SABİT. Bu sabitlik kritik — rastgele HSL üçlüsü paleti dağıtır.
    * Açıklık koyu temada versiyon dosyasında yükseltilir. --- */
-  --kurum-doygunluk: 62%;
+  --kurum-doygunluk: 22%;
   --kurum-aciklik: 42%;
 }
