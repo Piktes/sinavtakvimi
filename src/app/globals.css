@@ -77,6 +77,13 @@
 
 html {
   color-scheme: light;
+  /* Mobilde sağa/sola kaydırınca TÜM sayfa kayıyor hissi veriyordu: sayfa
+   * içindeki yatay şeritler (hikayeler, koleksiyon sekmeleri, V3 hafta
+   * şeridi) sonuna gelince kaydırma dışarı "taşıp" sayfanın kendisini
+   * kaydırıyordu (bkz. `overscroll-x-contain` şerit bileşenlerinde). Bu,
+   * hiçbir taşma olmasa bile mobil tarayıcıların kenar lastik-bandı
+   * (rubber-band) davranışına karşı son güvenlik önlemi. */
+  overflow-x: hidden;
 }
 
 [data-tema="koyu"] {

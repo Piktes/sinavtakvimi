@@ -24,7 +24,7 @@ export function HikayeSeridi({ hikayeler }: { hikayeler: HikayeOzet[] }) {
 
   return (
     <>
-      <ul className="serit-orta flex gap-4 overflow-x-auto pb-1">
+      <ul className="serit-orta flex gap-4 overflow-x-auto overscroll-x-contain pb-1">
         {hikayeler.map((hikaye, index) => (
           <li key={hikaye.id} className="flex shrink-0 flex-col items-center gap-1">
             <button

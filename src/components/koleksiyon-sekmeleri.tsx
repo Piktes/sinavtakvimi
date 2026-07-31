@@ -19,7 +19,7 @@ export function KoleksiyonSekmeleri({ koleksiyonlar }: { koleksiyonlar: Koleksiy
 
   return (
     <nav aria-label="Koleksiyonlar" className="border-t border-border">
-      <ul className="serit-orta mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 py-1">
+      <ul className="serit-orta mx-auto flex max-w-6xl gap-1 overflow-x-auto overscroll-x-contain px-4 py-1">
         {koleksiyonlar.map((koleksiyon) => {
           const hedef = `/k/${koleksiyon.slug}`;
           return (

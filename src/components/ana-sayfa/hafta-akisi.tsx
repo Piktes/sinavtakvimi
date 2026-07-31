@@ -28,7 +28,7 @@ export function HaftaAkisi({ gunler, kartlar }: { gunler: HaftaGunu[]; kartlar: 
   return (
     <>
       <div className="yapiskan-ust -mx-4 z-20 border-b border-border bg-bg px-4 py-2">
-        <ul className="flex gap-1 overflow-x-auto">
+        <ul className="flex gap-1 overflow-x-auto overscroll-x-contain">
           {gunler.map((gun) => {
             const gunSecili = gun.anahtar === secili;
             return (
