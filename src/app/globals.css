@@ -261,6 +261,18 @@ body {
   --ust-bar-yuksekligi: 128px;
 }
 
+/* Sekmeler (koleksiyonlar) kapanınca yapışkan üst barın belge akışındaki
+ * yüksekliği küçülür, altındaki her şey yukarı kayar. Tarayıcının otomatik
+ * "scroll anchoring"i bunu telafi etmeye çalışıp kullanıcının kaydırmasını
+ * geri çekiyordu (aşağı kaydırırken sayfa aniden yukarı zıplayıp şerit
+ * "birden kayboluyormuş" gibi görünüyordu — DevTools ölçümüyle doğrulandı:
+ * çıpalama kapatılınca kaydırma konumu sabit kalıyor). Bu sitede kaydırma
+ * pozisyonunu bekletecek geç yüklenen/yüksekliği değişen içerik yok, o yüzden
+ * çıpalamayı site genelinde kapatmanın bir bedeli yok. */
+html {
+  overflow-anchor: none;
+}
+
 .yapiskan-ust {
   position: sticky;
   top: var(--ust-bar-yuksekligi);
@@ -302,13 +314,18 @@ body {
 
 /* Sekme satırı kaydırınca tamamen kapanır — içerik için yer açar, en
  * belirgin hareket bu. `grid-template-rows` geçişi yüksekliği animasyonlu
- * kapatmanın (auto'ya animasyon yapılamadığı için) standart yolu. */
+ * kapatmanın (auto'ya animasyon yapılamadığı için) standart yolu. `--dur-slow`
+ * (200 değil) + hafif `translateY`: yalnızca küçülme "birden kayboluyor"
+ * hissi veriyordu, kaymayla birlikte katlanır gibi görünüyor. */
 .ust-bar-sekmeler {
   display: grid;
   grid-template-rows: 1fr;
+  opacity: 1;
+  transform: translateY(0);
   transition:
-    grid-template-rows var(--dur-base) var(--ease),
-    opacity var(--dur-base) var(--ease);
+    grid-template-rows var(--dur-slow) var(--ease),
+    opacity var(--dur-slow) var(--ease),
+    transform var(--dur-slow) var(--ease);
 }
 
 .ust-bar-sekmeler > * {
@@ -318,6 +335,7 @@ body {
 :root[data-kaydi="evet"] .ust-bar-sekmeler {
   grid-template-rows: 0fr;
   opacity: 0;
+  transform: translateY(-6px);
 }
 
 /* Okuma ilerlemesi: üst barın alt kenarında ince vurgu çizgisi. */

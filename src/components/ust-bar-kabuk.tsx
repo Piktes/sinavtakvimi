@@ -36,7 +36,12 @@ export function UstBarKabuk({ children }: { children: React.ReactNode }) {
     function kontrol() {
       const y = window.scrollY;
 
-      const durum = y > 8 ? "evet" : "hayir";
+      // Histerezis: tek bir eşik (ör. 8px) en ufak dokunuşta sekme
+      // satırını anında kapatıyor, "birden kayboluyor" hissi veriyordu.
+      // Kapanmak için daha uzun kaydırma (32px), açılmak için tepeye
+      // dönüş (8px) gerekiyor — ikisi arasında son durum korunur.
+      const kapaliMi = sonDurum.current === "evet";
+      const durum = (kapaliMi ? y > 8 : y > 32) ? "evet" : "hayir";
       if (durum !== sonDurum.current) {
         document.documentElement.dataset.kaydi = durum;
         sonDurum.current = durum;
