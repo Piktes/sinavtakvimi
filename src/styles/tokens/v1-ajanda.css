@@ -5,6 +5,11 @@
  * Açık: kağıt · mürekkep · işaret · vurgu
  * Koyu: aynı vurgular %10 düşük doygunluk
  * Yazı: Başlık Bricolage Grotesque 700 sıkı · Gövde Inter · Sayısal JetBrains Mono
+ *
+ * Palet "kağıt & mürekkep": zemin nötr gri değil KREM (basılı evrak), kart
+ * saf beyaz kalır ki zeminden net ayrışsın — eski palette ikisi birbirine
+ * çok yakındı ve arayüz "düz beyaz" görünüyordu. Metin siyah değil lacivert
+ * mürekkep; vurgu parlak sarı yerine kehribar (§3.5 kontrast korunarak).
  */
 
 [data-versiyon="v1"] {
@@ -18,54 +23,56 @@
 
 [data-versiyon="v1"],
 [data-versiyon="v1"][data-tema="acik"] {
-  --bg: #edeef0;
-  --bg-subtle: #e4e6e9;
+  --bg: #f2efe9;
+  --bg-subtle: #e9e4da;
   --surface: #ffffff;
-  --surface-hover: #f4f5f7;
-  --border: #d3d6db;
-  --border-strong: #b3b8c0;
+  --surface-hover: #faf8f4;
+  --border: #ddd6ca;
+  --border-strong: #bdb3a2;
 
-  --text: #131a24;
-  --text-muted: #4e5866;
-  --text-faint: #78828f;
+  --text: #1b2432;
+  --text-muted: #5d6675;
+  --text-faint: #7b8190;
 
-  --primary: #131a24;
-  --primary-hover: #2a3441;
+  --primary: #1b2432;
+  --primary-hover: #2f3a4d;
   --primary-fg: #ffffff;
 
-  --accent: #ffd43b;
-  --accent-fg: #131a24;
+  --accent: #d99b2b;
+  --accent-fg: #1b2432;
 
-  --success: #157f3d;
-  --success-bg: #dff3e6;
-  --warning: #9a6700;
-  --warning-bg: #fdf3d4;
-  --danger: #e03131;
-  --danger-bg: #fdeaea;
+  --success: #2f7d4f;
+  --success-bg: #e3efe4;
+  --warning: #8a6414;
+  --warning-bg: #f7edd6;
+  --danger: #c23b3b;
+  --danger-bg: #f8e6e4;
 
   --focus-ring: #1758c4;
   --kurum-aciklik: 42%;
 }
 
+/* Kağıdın gece hâli: nötr-soğuk gri değil, hafif sıcak koyu; metin saf beyaz
+ * değil kırık beyaz — aynı "basılı evrak" hissi karanlıkta da sürsün. */
 [data-versiyon="v1"][data-tema="koyu"] {
-  --bg: #0f1319;
-  --bg-subtle: #151a22;
-  --surface: #1a2029;
-  --surface-hover: #222933;
-  --border: #2c3540;
-  --border-strong: #3f4a58;
+  --bg: #14161b;
+  --bg-subtle: #191b21;
+  --surface: #1e2027;
+  --surface-hover: #262932;
+  --border: #31343d;
+  --border-strong: #454956;
 
-  --text: #e8eaed;
-  --text-muted: #a4adba;
-  --text-faint: #78828f;
+  --text: #ece9e3;
+  --text-muted: #a8a49c;
+  --text-faint: #7d7a73;
 
-  --primary: #e8eaed;
+  --primary: #ece9e3;
   --primary-hover: #ffffff;
-  --primary-fg: #0f1319;
+  --primary-fg: #14161b;
 
   /* §5: koyu temada vurgular %10 düşük doygunluk. */
-  --accent: #e6c04a;
-  --accent-fg: #0f1319;
+  --accent: #e0aa47;
+  --accent-fg: #14161b;
 
   --success: #5bc47f;
   --success-bg: #16281d;
