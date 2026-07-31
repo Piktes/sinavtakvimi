@@ -1,10 +1,11 @@
 /*
- * §5 V3 — "AKIŞ": uygulama gibi, KOYU VARSAYILAN, mobil öncelikli akış.
+ * §5 V3 — "AKIŞ": uygulama gibi, mobil öncelikli akış.
  *
  * Yazı: Başlık Space Grotesk 600 · Gövde IBM Plex Sans · Sayısal IBM Plex Mono
  *
- * Dikkat: v1/v2'nin aksine burada koyu tema VARSAYILAN — `data-tema`
- * yokken koyu değerler geçerlidir, açık tema açıkça seçilmelidir.
+ * Ürün kararı: şartname V3 için koyu varsayılan öngörüyordu; üç versiyonda
+ * tutarlı açılış deneyimi için açık varsayılana geçildi (bkz. tercihler.ts
+ * `varsayilanTema`). Koyu hâlâ mevcut, yalnızca açıkça seçilmesi gerekiyor.
  */
 
 [data-versiyon="v3"] {
@@ -16,38 +17,7 @@
   --rozet-harf-araligi: 0.02em;
 }
 
-/* Varsayılan = koyu (§5 V3). */
 [data-versiyon="v3"],
-[data-versiyon="v3"][data-tema="koyu"] {
-  --bg: #0e1116;
-  --bg-subtle: #12161c;
-  --surface: #161b22;
-  --surface-hover: #1e242d;
-  --border: #262c36;
-  --border-strong: #3a424f;
-
-  --text: #e6edf3;
-  --text-muted: #9aa7b5;
-  --text-faint: #6e7b8a;
-
-  --primary: #14b8a6;
-  --primary-hover: #2dd4bf;
-  --primary-fg: #04201c;
-
-  --accent: #8b5cf6;
-  --accent-fg: #f5f3ff;
-
-  --success: #14b8a6;
-  --success-bg: #06322d;
-  --warning: #f97316;
-  --warning-bg: #331705;
-  --danger: #f87171;
-  --danger-bg: #2c1212;
-
-  --focus-ring: #2dd4bf;
-  --kurum-aciklik: 64%;
-}
-
 [data-versiyon="v3"][data-tema="acik"] {
   --bg: #f7f8fa;
   --bg-subtle: #eef0f4;
@@ -76,4 +46,34 @@
 
   --focus-ring: #0f766e;
   --kurum-aciklik: 40%;
+}
+
+[data-versiyon="v3"][data-tema="koyu"] {
+  --bg: #0e1116;
+  --bg-subtle: #12161c;
+  --surface: #161b22;
+  --surface-hover: #1e242d;
+  --border: #262c36;
+  --border-strong: #3a424f;
+
+  --text: #e6edf3;
+  --text-muted: #9aa7b5;
+  --text-faint: #6e7b8a;
+
+  --primary: #14b8a6;
+  --primary-hover: #2dd4bf;
+  --primary-fg: #04201c;
+
+  --accent: #8b5cf6;
+  --accent-fg: #f5f3ff;
+
+  --success: #14b8a6;
+  --success-bg: #06322d;
+  --warning: #f97316;
+  --warning-bg: #331705;
+  --danger: #f87171;
+  --danger-bg: #2c1212;
+
+  --focus-ring: #2dd4bf;
+  --kurum-aciklik: 64%;
 }

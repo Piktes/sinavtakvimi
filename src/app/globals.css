@@ -83,17 +83,6 @@ html {
   color-scheme: dark;
 }
 
-/* §5 V3 "Akış" koyu varsayılan — tercih belirtilmemişse koyu. */
-[data-versiyon="v3"]:not([data-tema]) {
-  color-scheme: dark;
-}
-
-@media (prefers-color-scheme: dark) {
-  html:not([data-tema]) {
-    color-scheme: dark;
-  }
-}
-
 body {
   background: var(--bg);
   color: var(--text);

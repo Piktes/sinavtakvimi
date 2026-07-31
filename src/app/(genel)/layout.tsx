@@ -2,7 +2,7 @@ import { AltSekmeCubugu } from "@/components/alt-sekme-cubugu";
 import { SosyalIkonSatiri } from "@/components/sosyal-ikon-satiri";
 import { UstBar } from "@/components/ust-bar";
 import { prisma } from "@/lib/prisma";
-import { seciliDuzeyId, seciliTema } from "@/lib/tercihler";
+import { seciliDuzeyId, seciliTema, varsayilanTema } from "@/lib/tercihler";
 import { aktifVersiyon, VERSIYON_ADLARI } from "@/lib/versiyon";
 import { aktifSosyalBaglantilar } from "@/lib/veri/sosyal";
 import { koleksiyonlar } from "@/lib/veri/ilan";
@@ -23,10 +23,16 @@ export default async function GenelDuzen({ children }: { children: React.ReactNo
     aktifVersiyon(),
     aktifSosyalBaglantilar(),
   ]);
+  const efektifTema = tema ?? varsayilanTema();
 
   return (
     <>
-      <UstBar koleksiyonlar={sekmeler} duzeyler={duzeyler} seciliDuzeyId={duzeyId} tema={tema} />
+      <UstBar
+        koleksiyonlar={sekmeler}
+        duzeyler={duzeyler}
+        seciliDuzeyId={duzeyId}
+        tema={efektifTema}
+      />
 
       <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-5">{children}</div>
 

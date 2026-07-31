@@ -11,7 +11,7 @@ import {
   Space_Grotesk,
 } from "next/font/google";
 import "./globals.css";
-import { seciliTema } from "@/lib/tercihler";
+import { seciliTema, varsayilanTema } from "@/lib/tercihler";
 import { aktifVersiyon } from "@/lib/versiyon";
 
 // §5: üç versiyonun yazı tipleri. Yalnızca aktif versiyonun sınıfı <html>'e
@@ -71,15 +71,17 @@ export const metadata: Metadata = {
 
 export default async function KokDuzen({ children }: Readonly<{ children: React.ReactNode }>) {
   // §4.5: tema çerezden okunur ve SSR'da <html> üzerine yazılır — geçişte
-  // sıçrama olmaz (kabul kriteri #12). Çerez yoksa öznitelik hiç basılmaz,
-  // böylece CSS `prefers-color-scheme` (V3'te koyu varsayılan) devreye girer.
+  // sıçrama olmaz (kabul kriteri #12). Çerez yoksa `varsayilanTema` devreye
+  // girer — sistem tercihine (prefers-color-scheme) bakılmaz, açılış her
+  // zaman öngörülebilir tek bir görünümdür (açık).
   const [tema, versiyon] = await Promise.all([seciliTema(), aktifVersiyon()]);
+  const efektifTema = tema ?? varsayilanTema();
 
   return (
     <html
       lang="tr"
       data-versiyon={versiyon}
-      data-tema={tema ?? undefined}
+      data-tema={efektifTema}
       className={`${VERSIYON_YAZILARI[versiyon].join(" ")} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">{children}</body>

@@ -17,7 +17,7 @@ export async function UstBar({
   koleksiyonlar: KoleksiyonSekmesi[];
   duzeyler: DuzeySecenegi[];
   seciliDuzeyId: string | null;
-  tema: "acik" | "koyu" | null;
+  tema: "acik" | "koyu";
 }) {
   const uye = await uyeVarsa();
 

@@ -20,3 +20,11 @@ export async function seciliTema(): Promise<"acik" | "koyu" | null> {
   const deger = cerezler.get(TEMA_CEREZI)?.value;
   return deger === "acik" || deger === "koyu" ? deger : null;
 }
+
+// Kullanıcı hiç seçim yapmamışsa uygulanacak tema. Sistem tercihine (prefers-
+// color-scheme) BAKILMAZ — açılışta her zaman öngörülebilir tek bir görünüm:
+// açık. (Şartname §5 V3 için koyu varsayılan öngörüyordu; ürün kararıyla
+// üç versiyonda da açık varsayılana geçildi.)
+export function varsayilanTema(): "acik" {
+  return "acik";
+}

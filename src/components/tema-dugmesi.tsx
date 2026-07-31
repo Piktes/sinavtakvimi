@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 // §5: açık/koyu tema her üç versiyonda zorunlu. Tercih çereze yazılır,
 // SSR bir sonraki render'da <html data-tema> üzerine basar.
-export function TemaDugmesi({ tema }: { tema: "acik" | "koyu" | null }) {
+export function TemaDugmesi({ tema }: { tema: "acik" | "koyu" }) {
   const [beklemede, baslatGecis] = useTransition();
   const koyuMu = tema === "koyu";
 
